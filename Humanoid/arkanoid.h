@@ -34,6 +34,7 @@ static int bricks;
 static int gameState;
 static int level = 1;
 static int score = 0;
+static int comboMultiplier = 1;
 
 static bool levelReady = false;
 static bool gameOver = false;

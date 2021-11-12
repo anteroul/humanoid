@@ -1,7 +1,6 @@
 #include "arkanoid.h"
 #include "GUI.h"
 #include "GameManager.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -155,13 +154,15 @@ void UpdateGame(void)
             }
 
             // Collision logic: ball vs walls
-            if (((ball.position.x + ball.radius) >= screenWidth) || ((ball.position.x - ball.radius) <= 0)) ball.speed.x *= -1;
-            if ((ball.position.y - ball.radius) <= 0) ball.speed.y *= -1;
+            if (((ball.position.x + ball.radius) >= screenWidth) || ((ball.position.x - ball.radius) <= 0))
+                ball.speed.x *= -1;
+            if ((ball.position.y - ball.radius) <= 0)
+                ball.speed.y *= -1;
             if ((ball.position.y + ball.radius) >= screenHeight)
             {
                 ball.speed = Vector2 { 0, 0 };
                 ball.active = false;
-
+                comboMultiplier = 1;
                 player.life--;
             }
 
@@ -175,6 +176,7 @@ void UpdateGame(void)
                 {
                     ball.speed.y *= -1;
                     ball.speed.x = (ball.position.x - player.position.x) / (player.size.x / 2) * 5;
+                    comboMultiplier = 1;
                 }
             }
 
@@ -192,8 +194,9 @@ void UpdateGame(void)
                             {
                                 brick[i][j].active = false;
                                 ball.speed.y *= -1;
-                                score += 100;
+                                score += 100 * comboMultiplier;
                                 bricks--;
+                                comboMultiplier++;
                             }
                             // Hit above
                             else if (((ball.position.y + ball.radius) >= (brick[i][j].position.y - brickSize.y / 2)) &&
@@ -202,8 +205,9 @@ void UpdateGame(void)
                             {
                                 brick[i][j].active = false;
                                 ball.speed.y *= -1;
-                                score += 100;
+                                score += 100 * comboMultiplier;
                                 bricks--;
+                                comboMultiplier++;
                             }
                             // Hit left
                             else if (((ball.position.x + ball.radius) >= (brick[i][j].position.x - brickSize.x / 2)) &&
@@ -212,8 +216,9 @@ void UpdateGame(void)
                             {
                                 brick[i][j].active = false;
                                 ball.speed.x *= -1;
-                                score += 100;
+                                score += 100 * comboMultiplier;
                                 bricks--;
+                                comboMultiplier++;
                             }
                             // Hit right
                             else if (((ball.position.x - ball.radius) <= (brick[i][j].position.x + brickSize.x / 2)) &&
@@ -222,8 +227,9 @@ void UpdateGame(void)
                             {
                                 brick[i][j].active = false;
                                 ball.speed.x *= -1;
-                                score += 100;
+                                score += 100 * comboMultiplier;
                                 bricks--;
+                                comboMultiplier++;
                             }
                         }
                     }
@@ -306,9 +312,6 @@ void DrawGame(void)
             // Draw player lives
             for (int i = 0; i < player.life; i++) DrawRectangle(20 + 40 * i, screenHeight - 30, 35, 10, RED);
 
-            // Draw score
-            DrawText(TextFormat("%04i", score), screenWidth - 100, screenHeight - 50, 40, BLACK);
-
             // Draw ball
             DrawCircleV(ball.position, ball.radius, MAROON);
 
@@ -324,6 +327,11 @@ void DrawGame(void)
                     }
                 }
             }
+
+            // Draw score
+            DrawText(TextFormat("%04i", score), screenWidth - 150, screenHeight - 50, 40, BLACK);
+
+            if (comboMultiplier > 2) DrawText(TextFormat("%01ix Combo!", comboMultiplier - 1), GetScreenWidth() / 2 - 50, GetScreenHeight() / 2, 20, GameManager::GetColor(comboMultiplier));
 
             if (pause) DrawText("GAME PAUSED", screenWidth / 2 - MeasureText("GAME PAUSED", 40) / 2, screenHeight / 2 - 40, 40, GRAY);
         }
