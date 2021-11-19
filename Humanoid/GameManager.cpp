@@ -1,5 +1,4 @@
 #include "GameManager.h"
-#include "arkanoid.h"
 
 GameManager::GameManager()
 {
@@ -34,5 +33,16 @@ Color GameManager::GetColor(int combo)
 		return WHITE;
 	default:
 		return MAGENTA;
+	}
+}
+
+bool GameManager::onClickEvent(Rectangle btn)
+{
+	if (IsMouseButtonReleased(0))
+	{
+		if (CheckCollisionPointRec(GetMousePosition(), btn))
+			return true;
+		else
+			return false;
 	}
 }

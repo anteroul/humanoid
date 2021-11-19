@@ -37,46 +37,40 @@ void UpdateMenu(void)
 {
     if (gameState == MENU)
     {
-        if (IsMouseButtonReleased(0))
-        {
-            if (CheckCollisionPointRec(GetMousePosition(), play_btn.btn_rect))
-                gameState = GAMEPLAY;
-            if (CheckCollisionPointRec(GetMousePosition(), conf_btn.btn_rect))
-                gameState = SETTINGS;
-            if (CheckCollisionPointRec(GetMousePosition(), exit_btn.btn_rect))
-                gameState = QUIT;
-        }
+        if (GameManager::onClickEvent(play_btn.btn_rect))
+            gameState = GAMEPLAY;
+        if (GameManager::onClickEvent(conf_btn.btn_rect))
+            gameState = SETTINGS;
+        if (GameManager::onClickEvent(exit_btn.btn_rect))
+            gameState = QUIT;
     }
     else if (gameState == SETTINGS)
     {
-        if (IsMouseButtonReleased(0))
+        if (GameManager::onClickEvent(fullScreen.btn_rect))
         {
-            if (CheckCollisionPointRec(GetMousePosition(), fullScreen.btn_rect))
-            {
-                if (!fullScreen.enabled)
-                    fullScreen.enabled = true;
-                else
-                    fullScreen.enabled = false;
-                ToggleFullscreen();
-            }
-            if (CheckCollisionPointRec(GetMousePosition(), frameLimiter.btn_rect))
-            {
-                if (!frameLimiter.enabled)
-                {
-                    frameLimiter.enabled = true;
-                    SetTargetFPS(60);
-                }
-                else
-                {
-                    frameLimiter.enabled = false;
-                    SetTargetFPS(GetMonitorRefreshRate(GetCurrentMonitor()));
-                }
-            }
-            if (CheckCollisionPointRec(GetMousePosition(), play_btn_copy.btn_rect))
-                gameState = GAMEPLAY;
-            if (CheckCollisionPointRec(GetMousePosition(), exit_btn.btn_rect))
-                gameState = QUIT;
+            if (!fullScreen.enabled)
+                fullScreen.enabled = true;
+            else
+                fullScreen.enabled = false;
+            ToggleFullscreen();
         }
+        if (GameManager::onClickEvent(frameLimiter.btn_rect))
+        {
+            if (!frameLimiter.enabled)
+            {
+                frameLimiter.enabled = true;
+                SetTargetFPS(60);
+            }
+            else
+            {
+                frameLimiter.enabled = false;
+                SetTargetFPS(GetMonitorRefreshRate(GetCurrentMonitor()));
+            }
+        }
+        if (GameManager::onClickEvent(play_btn_copy.btn_rect))
+            gameState = GAMEPLAY;
+        if (GameManager::onClickEvent(exit_btn.btn_rect))
+            gameState = QUIT;
     }
 }
 
