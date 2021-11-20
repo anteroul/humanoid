@@ -4,7 +4,7 @@
 
 #define PLAYER_MAX_LIFE         5
 #define LINES_OF_BRICKS         5
-#define BRICKS_PER_LINE        20
+#define BRICKS_PER_LINE        15
 
 
 typedef enum GameScreen { MENU, SETTINGS, GAMEPLAY, QUIT } GameScreen;

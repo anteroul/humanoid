@@ -82,13 +82,17 @@ void InitGame(void)
     // Initialize player
     player.position = Vector2 { screenWidth / 2, screenHeight * 7 / 8 };
     player.size = Vector2 { screenWidth / 10, 20 };
-    player.life = PLAYER_MAX_LIFE;
+
+    if (level == 1)
+        player.life = PLAYER_MAX_LIFE;
 
     // Initialize ball
     ball.position = Vector2 { screenWidth / 2, screenHeight * 7 / 8 - 30 };
     ball.speed = Vector2 { 0, 0 };
     ball.radius = 7;
     ball.active = false;
+
+    comboMultiplier = 1;
 
     // Initialize bricks
     int initialDownPosition = 50;
@@ -114,7 +118,7 @@ void UpdateGame(void)
 
         if (bricks == 0)
         {
-            level = GameManager::LevelUp(level);
+            level++;
             levelReady = false;
         }
 
@@ -247,18 +251,19 @@ void UpdateGame(void)
     {
         if (IsKeyPressed(KEY_ENTER))
         {
+            score = 0;
+            level = 1;
             InitGame();
             gameOver = false;
-            score = 0;
         }
         if (IsKeyPressed(KEY_BACKSPACE))
         {
+            score = 0;
+            level = 1;
             levelReady = false;
             gameOver = false;
             gameState = MENU;
-            score = 0;
         }
-        level = 1;
     }
 }
 
@@ -316,7 +321,8 @@ void DrawGame(void)
                 {
                     if (brick[i][j].active)
                     {
-                        if ((i + j) % 2 == 0) DrawRectangle(brick[i][j].position.x - brickSize.x / 2, brick[i][j].position.y - brickSize.y / 2, brickSize.x, brickSize.y, GREEN);
+                        if ((i + j) % 2 == 0)
+                            DrawRectangle(brick[i][j].position.x - brickSize.x / 2, brick[i][j].position.y - brickSize.y / 2, brickSize.x, brickSize.y, GREEN);
                         else DrawRectangle(brick[i][j].position.x - brickSize.x / 2, brick[i][j].position.y - brickSize.y / 2, brickSize.x, brickSize.y, YELLOW);
                     }
                 }
@@ -325,7 +331,8 @@ void DrawGame(void)
             // Draw score
             DrawText(TextFormat("%04i", score), screenWidth - 150, screenHeight - 50, 40, BLACK);
 
-            if (comboMultiplier > 2) DrawText(TextFormat("%01ix Combo!", comboMultiplier - 1), GetScreenWidth() / 2 - 50, GetScreenHeight() / 2, 20, GameManager::GetColor(comboMultiplier));
+            if (comboMultiplier > 2)
+                DrawText(TextFormat("%01ix Combo!", comboMultiplier - 1), GetScreenWidth() / 2 - 50, GetScreenHeight() / 2, 20, GameManager::GetColor(comboMultiplier));
 
             if (pause) DrawText("GAME PAUSED", screenWidth / 2 - MeasureText("GAME PAUSED", 40) / 2, screenHeight / 2 - 40, 40, GRAY);
         }

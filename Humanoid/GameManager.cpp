@@ -8,11 +8,6 @@ GameManager::~GameManager()
 {
 }
 
-int GameManager::LevelUp(int level)
-{
-	return level++;
-}
-
 Color GameManager::GetColor(int combo)
 {
 	switch (combo)
