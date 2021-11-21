@@ -119,7 +119,7 @@ void UpdateGame(void)
     {
         if (IsKeyPressed('P')) pause = !pause;
 
-        if (bricks == 0)
+        if (bricks <= 0)
         {
             level++;
             levelReady = false;
@@ -193,8 +193,8 @@ void UpdateGame(void)
                             // Destroy brick if brick type is downgraded below type 1
                             if (brick[i][j].brickType < 1)
                             {
-                                brick[i][j].active = false;
                                 bricks--;
+                                brick[i][j].active = false;
                             }
                             if (brick[i][j].brickType == 1)
                             {
