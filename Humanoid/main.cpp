@@ -1,6 +1,7 @@
 #include "arkanoid.h"
-#include "GUI.h"
 #include "GameManager.h"
+#include "GUI.h"
+#include "levels.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -76,7 +77,6 @@ void UpdateMenu(void)
 
 void InitGame(void)
 {
-    bricks = BRICKS_PER_LINE * LINES_OF_BRICKS;
     brickSize = Vector2 { screenWidth / BRICKS_PER_LINE, 40 };
 
     // Initialize player
@@ -103,6 +103,9 @@ void InitGame(void)
         {
             brick[i][j].position = Vector2 { j * brickSize.x + brickSize.x / 2, i * brickSize.y + initialDownPosition };
             brick[i][j].active = true;
+            brick[i][j].brickType = brickMap[level][i][j];
+            if (brick[i][j].brickType != 5)
+                bricks++;
         }
     }
 
@@ -121,6 +124,8 @@ void UpdateGame(void)
             level++;
             levelReady = false;
         }
+
+        if (level > 8) gameOver = true;
 
         if (!pause)
         {
@@ -185,49 +190,83 @@ void UpdateGame(void)
                     {
                         if (brick[i][j].active)
                         {
+                            // Destroy brick if brick type is downgraded below type 1
+                            if (brick[i][j].brickType < 1)
+                            {
+                                brick[i][j].active = false;
+                                bricks--;
+                            }
+                            if (brick[i][j].brickType == 1)
+                            {
+                                brick[i][j].color = YELLOW;
+                            }
+                            else if (brick[i][j].brickType == 2)
+                            {
+                                brick[i][j].color = GREEN;
+                            }
+                            else if (brick[i][j].brickType == 3)
+                            {
+                                brick[i][j].color = BLUE;
+                            }
+                            else if (brick[i][j].brickType == 4)
+                            {
+                                brick[i][j].color = MAGENTA;
+                            }
+                            else if (brick[i][j].brickType == 5)
+                            {
+                                brick[i][j].color = DARKGRAY;
+                            }
                             // Hit below
                             if (((ball.position.y - ball.radius) <= (brick[i][j].position.y + brickSize.y / 2)) &&
                                 ((ball.position.y - ball.radius) > (brick[i][j].position.y + brickSize.y / 2 + ball.speed.y)) &&
                                 ((fabs(ball.position.x - brick[i][j].position.x)) < (brickSize.x / 2 + ball.radius * 2 / 3)) && (ball.speed.y < 0))
                             {
-                                brick[i][j].active = false;
+                                if (brick[i][j].brickType != 5)
+                                {
+                                    brick[i][j].brickType -= 2;
+                                    score += 100 * comboMultiplier;
+                                    comboMultiplier++;
+                                }
                                 ball.speed.y *= -1;
-                                score += 100 * comboMultiplier;
-                                bricks--;
-                                comboMultiplier++;
                             }
                             // Hit above
                             else if (((ball.position.y + ball.radius) >= (brick[i][j].position.y - brickSize.y / 2)) &&
                                 ((ball.position.y + ball.radius) < (brick[i][j].position.y - brickSize.y / 2 + ball.speed.y)) &&
                                 ((fabs(ball.position.x - brick[i][j].position.x)) < (brickSize.x / 2 + ball.radius * 2 / 3)) && (ball.speed.y > 0))
                             {
-                                brick[i][j].active = false;
+                                if (brick[i][j].brickType != 5)
+                                {
+                                    brick[i][j].brickType -= 2;
+                                    score += 100 * comboMultiplier;
+                                    comboMultiplier++;
+                                }
                                 ball.speed.y *= -1;
-                                score += 100 * comboMultiplier;
-                                bricks--;
-                                comboMultiplier++;
                             }
                             // Hit left
                             else if (((ball.position.x + ball.radius) >= (brick[i][j].position.x - brickSize.x / 2)) &&
                                 ((ball.position.x + ball.radius) < (brick[i][j].position.x - brickSize.x / 2 + ball.speed.x)) &&
                                 ((fabs(ball.position.y - brick[i][j].position.y)) < (brickSize.y / 2 + ball.radius * 2 / 3)) && (ball.speed.x > 0))
                             {
-                                brick[i][j].active = false;
+                                if (brick[i][j].brickType != 5)
+                                {
+                                    brick[i][j].brickType -= 2;
+                                    score += 100 * comboMultiplier;
+                                    comboMultiplier++;
+                                }
                                 ball.speed.x *= -1;
-                                score += 100 * comboMultiplier;
-                                bricks--;
-                                comboMultiplier++;
                             }
                             // Hit right
                             else if (((ball.position.x - ball.radius) <= (brick[i][j].position.x + brickSize.x / 2)) &&
                                 ((ball.position.x - ball.radius) > (brick[i][j].position.x + brickSize.x / 2 + ball.speed.x)) &&
                                 ((fabs(ball.position.y - brick[i][j].position.y)) < (brickSize.y / 2 + ball.radius * 2 / 3)) && (ball.speed.x < 0))
                             {
-                                brick[i][j].active = false;
+                                if (brick[i][j].brickType != 5)
+                                {
+                                    brick[i][j].brickType -= 2;
+                                    score += 100 * comboMultiplier;
+                                    comboMultiplier++;
+                                }
                                 ball.speed.x *= -1;
-                                score += 100 * comboMultiplier;
-                                bricks--;
-                                comboMultiplier++;
                             }
                         }
                     }
@@ -320,11 +359,7 @@ void DrawGame(void)
                 for (int j = 0; j < BRICKS_PER_LINE; j++)
                 {
                     if (brick[i][j].active)
-                    {
-                        if ((i + j) % 2 == 0)
-                            DrawRectangle(brick[i][j].position.x - brickSize.x / 2, brick[i][j].position.y - brickSize.y / 2, brickSize.x, brickSize.y, GREEN);
-                        else DrawRectangle(brick[i][j].position.x - brickSize.x / 2, brick[i][j].position.y - brickSize.y / 2, brickSize.x, brickSize.y, YELLOW);
-                    }
+                        DrawRectangle(brick[i][j].position.x - brickSize.x / 2, brick[i][j].position.y - brickSize.y / 2, brickSize.x, brickSize.y, brick[i][j].color);
                 }
             }
 

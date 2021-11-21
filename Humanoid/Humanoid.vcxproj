@@ -156,6 +156,7 @@
     <ClInclude Include="arkanoid.h" />
     <ClInclude Include="GameManager.h" />
     <ClInclude Include="GUI.h" />
+    <ClInclude Include="levels.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

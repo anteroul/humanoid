@@ -3,6 +3,7 @@
 #include "raylib.h"
 
 #define PLAYER_MAX_LIFE         5
+#define LEVELS                  9
 #define LINES_OF_BRICKS         5
 #define BRICKS_PER_LINE        15
 
@@ -25,6 +26,8 @@ typedef struct Ball {
 typedef struct Brick {
     Vector2 position;
     bool active;
+    int brickType;
+    Color color;
 } Brick;
 
 static const int screenWidth = 800;
