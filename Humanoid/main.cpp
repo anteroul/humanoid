@@ -93,6 +93,7 @@ void InitGame(void)
     ball.active = false;
 
     comboMultiplier = 1;
+    powerup = 0;
 
     // Initialize bricks
     int initialDownPosition = 50;
@@ -120,13 +121,13 @@ void UpdateGame(void)
     {
         if (IsKeyPressed('P')) pause = !pause;
 
+        if (level == LEVELS) level = 1;
+
         if (bricks <= 0)
         {
             level++;
             levelReady = false;
         }
-
-        if (level == LEVELS) level = 1;
 
         if (!pause)
         {
@@ -202,6 +203,7 @@ void UpdateGame(void)
                             {
                                 bricks--;
                                 brick[i][j].active = false;
+                                powerup = GameManager::ActivatePowerUp();
                             }
 
                             // Hit below
@@ -258,6 +260,17 @@ void UpdateGame(void)
                             }
                         }
                     }
+                }
+
+                // Power-up logic
+                switch (powerup)
+                {
+                case 1:
+                    player.life++;
+                    powerup = EXTRA_LIFE;
+                    break;
+                default:
+                    break;
                 }
 
                 // Game over logic
