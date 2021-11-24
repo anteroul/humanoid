@@ -96,6 +96,7 @@ void InitGame(void)
 
     // Initialize bricks
     int initialDownPosition = 50;
+    bricks = 0;
 
     for (int i = 0; i < LINES_OF_BRICKS; i++)
     {
@@ -190,32 +191,19 @@ void UpdateGame(void)
                     {
                         if (brick[i][j].active)
                         {
+                            // Brick colors
+                            if (brick[i][j].brickType == 1) brick[i][j].color = YELLOW;
+                            else if (brick[i][j].brickType == 2) brick[i][j].color = GREEN;
+                            else if (brick[i][j].brickType == 3) brick[i][j].color = BLUE;
+                            else if (brick[i][j].brickType == 4) brick[i][j].color = MAGENTA;
+                            else if (brick[i][j].brickType == 5) brick[i][j].color = DARKGRAY;
                             // Destroy brick if brick type is downgraded below type 1
-                            if (brick[i][j].brickType < 1)
+                            else
                             {
                                 bricks--;
                                 brick[i][j].active = false;
                             }
-                            if (brick[i][j].brickType == 1)
-                            {
-                                brick[i][j].color = YELLOW;
-                            }
-                            else if (brick[i][j].brickType == 2)
-                            {
-                                brick[i][j].color = GREEN;
-                            }
-                            else if (brick[i][j].brickType == 3)
-                            {
-                                brick[i][j].color = BLUE;
-                            }
-                            else if (brick[i][j].brickType == 4)
-                            {
-                                brick[i][j].color = MAGENTA;
-                            }
-                            else if (brick[i][j].brickType == 5)
-                            {
-                                brick[i][j].color = DARKGRAY;
-                            }
+
                             // Hit below
                             if (((ball.position.y - ball.radius) <= (brick[i][j].position.y + brickSize.y / 2)) &&
                                 ((ball.position.y - ball.radius) > (brick[i][j].position.y + brickSize.y / 2 + ball.speed.y)) &&
