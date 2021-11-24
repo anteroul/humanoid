@@ -126,7 +126,7 @@ void UpdateGame(void)
             levelReady = false;
         }
 
-        if (level > 8) gameOver = true;
+        if (level == LEVELS) level = 1;
 
         if (!pause)
         {

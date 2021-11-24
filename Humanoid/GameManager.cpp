@@ -1,4 +1,5 @@
 #include "GameManager.h"
+#include "stdlib.h"
 
 GameManager::GameManager()
 {
@@ -40,4 +41,21 @@ bool GameManager::onClickEvent(Rectangle btn)
 		else
 			return false;
 	}
+}
+
+int GameManager::ActivatePowerUp()
+{
+	if (RandomBool())
+		return rand() % 5 + 1;
+	else return 0;
+}
+
+bool GameManager::RandomBool()
+{
+	int i = rand() % 100 + 1;
+
+	if (i % 10 == 0)
+		return true;
+	else
+		return false;
 }
