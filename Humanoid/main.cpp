@@ -17,7 +17,6 @@ int main(void)
     {
         if (gameState == QUIT)      // Break the game loop if gameState is set to 'QUIT'
             break;
-
         UpdateDrawFrame();
     }
 
@@ -32,8 +31,13 @@ void StartUp(void)
 {
     InitAudioDevice();
     SetTargetFPS(GetMonitorRefreshRate(GetCurrentMonitor()));
-    gameState = MENU;
     comboSfx = LoadSound("sounds/coin.wav");
+    hitSfx = LoadSound("sounds/hit.wav");
+    extraLife = LoadSound("sounds/1up.wav");
+    loseLife = LoadSound("sounds/fail.wav");
+    beginSfx = LoadSound("sounds/ready.wav");
+    gameOverSfx = LoadSound("sounds/game_over.wav");
+    gameState = MENU;
 }
 
 void UpdateMenu(void)
@@ -112,7 +116,7 @@ void InitGame(void)
                 bricks++;
         }
     }
-
+    PlaySound(beginSfx);
     levelReady = true;
 }
 
@@ -145,7 +149,7 @@ void UpdateGame(void)
                 if (IsKeyPressed(KEY_SPACE))
                 {
                     ball.active = true;
-                    ball.speed = Vector2 { 0, -5 };
+                    ball.speed = Vector2{ 0, -5 };
                 }
             }
 
@@ -157,142 +161,159 @@ void UpdateGame(void)
             }
             else
             {
-                ball.position = Vector2 { player.position.x, screenHeight * 7 / 8 - 30 };
+                ball.position = Vector2{ player.position.x, screenHeight * 7 / 8 - 30 };
             }
 
             // Collision logic: ball vs walls
             if (((ball.position.x + ball.radius) >= screenWidth) || ((ball.position.x - ball.radius) <= 0))
+            {
                 ball.speed.x *= -1;
+                PlaySound(hitSfx);
+            }
             if ((ball.position.y - ball.radius) <= 0)
+            {
                 ball.speed.y *= -1;
+                PlaySound(hitSfx);
+            }
             if ((ball.position.y + ball.radius) >= screenHeight)
             {
-                ball.speed = Vector2 { 0, 0 };
+                ball.speed = Vector2{ 0, 0 };
                 ball.active = false;
                 comboMultiplier = 1;
                 player.life--;
+                PlaySound(loseLife);
             }
 
             // Collision logic: ball vs player
             if (CheckCollisionCircleRec(ball.position, ball.radius,
-                Rectangle {
+                Rectangle{
                 player.position.x - player.size.x / 2, player.position.y - player.size.y / 2, player.size.x, player.size.y
-            }))
+                }))
             {
                 if (ball.speed.y > 0)
                 {
                     ball.speed.y *= -1;
                     ball.speed.x = (ball.position.x - player.position.x) / (player.size.x / 2) * 5;
                     comboMultiplier = 1;
+                    PlaySound(hitSfx);
                 }
             }
 
-                // Collision logic: ball vs bricks
+            // Collision logic: ball vs bricks
+            for (int i = 0; i < LINES_OF_BRICKS; i++)
+            {
+                for (int j = 0; j < BRICKS_PER_LINE; j++)
+                {
+                    if (brick[i][j].active)
+                    {
+                        // Brick colors
+                        if (brick[i][j].brickType == 1) brick[i][j].color = YELLOW;
+                        else if (brick[i][j].brickType == 2) brick[i][j].color = GREEN;
+                        else if (brick[i][j].brickType == 3) brick[i][j].color = BLUE;
+                        else if (brick[i][j].brickType == 4) brick[i][j].color = MAGENTA;
+                        else if (brick[i][j].brickType == 5) brick[i][j].color = DARKGRAY;
+                        // Destroy brick if brick type is downgraded below type 1
+                        else
+                        {
+                            bricks--;
+                            brick[i][j].active = false;
+                            powerup = GameManager::ActivatePowerUp();
+                        }
+
+                        // Hit below
+                        if (((ball.position.y - ball.radius) <= (brick[i][j].position.y + brickSize.y / 2)) &&
+                            ((ball.position.y - ball.radius) > (brick[i][j].position.y + brickSize.y / 2 + ball.speed.y)) &&
+                            ((fabs(ball.position.x - brick[i][j].position.x)) < (brickSize.x / 2 + ball.radius * 2 / 3)) && (ball.speed.y < 0))
+                        {
+                            if (brick[i][j].brickType != 5)
+                            {
+                                brick[i][j].brickType -= 2;
+                                score += 100 * comboMultiplier;
+                                comboMultiplier++;
+                                GameManager::PlayComboSfx(&comboSfx, comboMultiplier);
+                            }
+                            else PlaySound(hitSfx);
+                            ball.speed.y *= -1;
+                        }
+                        // Hit above
+                        else if (((ball.position.y + ball.radius) >= (brick[i][j].position.y - brickSize.y / 2)) &&
+                            ((ball.position.y + ball.radius) < (brick[i][j].position.y - brickSize.y / 2 + ball.speed.y)) &&
+                            ((fabs(ball.position.x - brick[i][j].position.x)) < (brickSize.x / 2 + ball.radius * 2 / 3)) && (ball.speed.y > 0))
+                        {
+                            if (brick[i][j].brickType != 5)
+                            {
+                                brick[i][j].brickType -= 2;
+                                score += 100 * comboMultiplier;
+                                comboMultiplier++;
+                                GameManager::PlayComboSfx(&comboSfx, comboMultiplier);
+                            }
+                            else PlaySound(hitSfx);
+                            ball.speed.y *= -1;
+                        }
+                        // Hit left
+                        else if (((ball.position.x + ball.radius) >= (brick[i][j].position.x - brickSize.x / 2)) &&
+                            ((ball.position.x + ball.radius) < (brick[i][j].position.x - brickSize.x / 2 + ball.speed.x)) &&
+                            ((fabs(ball.position.y - brick[i][j].position.y)) < (brickSize.y / 2 + ball.radius * 2 / 3)) && (ball.speed.x > 0))
+                        {
+                            if (brick[i][j].brickType != 5)
+                            {
+                                brick[i][j].brickType -= 2;
+                                score += 100 * comboMultiplier;
+                                comboMultiplier++;
+                                GameManager::PlayComboSfx(&comboSfx, comboMultiplier);
+                            }
+                            else PlaySound(hitSfx);
+                            ball.speed.x *= -1;
+                        }
+                        // Hit right
+                        else if (((ball.position.x - ball.radius) <= (brick[i][j].position.x + brickSize.x / 2)) &&
+                            ((ball.position.x - ball.radius) > (brick[i][j].position.x + brickSize.x / 2 + ball.speed.x)) &&
+                            ((fabs(ball.position.y - brick[i][j].position.y)) < (brickSize.y / 2 + ball.radius * 2 / 3)) && (ball.speed.x < 0))
+                        {
+                            if (brick[i][j].brickType != 5)
+                            {
+                                brick[i][j].brickType -= 2;
+                                score += 100 * comboMultiplier;
+                                comboMultiplier++;
+                                GameManager::PlayComboSfx(&comboSfx, comboMultiplier);
+                            }
+                            else PlaySound(hitSfx);
+                            ball.speed.x *= -1;
+                        }
+                    }
+                }
+            }
+
+            // TODO: Functionality for rest of the power-ups.
+            // 
+            // Power-up logic
+            switch (powerup)
+            {
+            case EXTRA_LIFE:
+                player.life++;
+                PlaySound(extraLife);
+                powerup = NONE;
+                break;
+            default:
+                break;
+            }
+
+            // Game over logic
+            if (player.life <= 0 && gameOver == false)
+            {
+                gameOver = true;
+                PlaySound(gameOverSfx);
+            }
+            else
+            {
                 for (int i = 0; i < LINES_OF_BRICKS; i++)
                 {
                     for (int j = 0; j < BRICKS_PER_LINE; j++)
                     {
-                        if (brick[i][j].active)
-                        {
-                            // Brick colors
-                            if (brick[i][j].brickType == 1) brick[i][j].color = YELLOW;
-                            else if (brick[i][j].brickType == 2) brick[i][j].color = GREEN;
-                            else if (brick[i][j].brickType == 3) brick[i][j].color = BLUE;
-                            else if (brick[i][j].brickType == 4) brick[i][j].color = MAGENTA;
-                            else if (brick[i][j].brickType == 5) brick[i][j].color = DARKGRAY;
-                            // Destroy brick if brick type is downgraded below type 1
-                            else
-                            {
-                                bricks--;
-                                brick[i][j].active = false;
-                                powerup = GameManager::ActivatePowerUp();
-                            }
-
-                            // Hit below
-                            if (((ball.position.y - ball.radius) <= (brick[i][j].position.y + brickSize.y / 2)) &&
-                                ((ball.position.y - ball.radius) > (brick[i][j].position.y + brickSize.y / 2 + ball.speed.y)) &&
-                                ((fabs(ball.position.x - brick[i][j].position.x)) < (brickSize.x / 2 + ball.radius * 2 / 3)) && (ball.speed.y < 0))
-                            {
-                                if (brick[i][j].brickType != 5)
-                                {
-                                    brick[i][j].brickType -= 2;
-                                    score += 100 * comboMultiplier;
-                                    comboMultiplier++;
-                                    GameManager::PlayComboSfx(&comboSfx, comboMultiplier);
-                                }
-                                ball.speed.y *= -1;
-                            }
-                            // Hit above
-                            else if (((ball.position.y + ball.radius) >= (brick[i][j].position.y - brickSize.y / 2)) &&
-                                ((ball.position.y + ball.radius) < (brick[i][j].position.y - brickSize.y / 2 + ball.speed.y)) &&
-                                ((fabs(ball.position.x - brick[i][j].position.x)) < (brickSize.x / 2 + ball.radius * 2 / 3)) && (ball.speed.y > 0))
-                            {
-                                if (brick[i][j].brickType != 5)
-                                {
-                                    brick[i][j].brickType -= 2;
-                                    score += 100 * comboMultiplier;
-                                    comboMultiplier++;
-                                    GameManager::PlayComboSfx(&comboSfx, comboMultiplier);
-                                }
-                                ball.speed.y *= -1;
-                            }
-                            // Hit left
-                            else if (((ball.position.x + ball.radius) >= (brick[i][j].position.x - brickSize.x / 2)) &&
-                                ((ball.position.x + ball.radius) < (brick[i][j].position.x - brickSize.x / 2 + ball.speed.x)) &&
-                                ((fabs(ball.position.y - brick[i][j].position.y)) < (brickSize.y / 2 + ball.radius * 2 / 3)) && (ball.speed.x > 0))
-                            {
-                                if (brick[i][j].brickType != 5)
-                                {
-                                    brick[i][j].brickType -= 2;
-                                    score += 100 * comboMultiplier;
-                                    comboMultiplier++;
-                                    GameManager::PlayComboSfx(&comboSfx, comboMultiplier);
-                                }
-                                ball.speed.x *= -1;
-                            }
-                            // Hit right
-                            else if (((ball.position.x - ball.radius) <= (brick[i][j].position.x + brickSize.x / 2)) &&
-                                ((ball.position.x - ball.radius) > (brick[i][j].position.x + brickSize.x / 2 + ball.speed.x)) &&
-                                ((fabs(ball.position.y - brick[i][j].position.y)) < (brickSize.y / 2 + ball.radius * 2 / 3)) && (ball.speed.x < 0))
-                            {
-                                if (brick[i][j].brickType != 5)
-                                {
-                                    brick[i][j].brickType -= 2;
-                                    score += 100 * comboMultiplier;
-                                    comboMultiplier++;
-                                    GameManager::PlayComboSfx(&comboSfx, comboMultiplier);
-                                }
-                                ball.speed.x *= -1;
-                            }
-                        }
+                        if (brick[i][j].active) gameOver = false;
                     }
                 }
-
-                // TODO: Functionality for rest of the power-ups.
-                // 
-                // Power-up logic
-                switch (powerup)
-                {
-                case EXTRA_LIFE:
-                    player.life++;
-                    powerup = NONE;
-                    break;
-                default:
-                    break;
-                }
-
-                // Game over logic
-                if (player.life <= 0) gameOver = true;
-                else
-                {
-                    for (int i = 0; i < LINES_OF_BRICKS; i++)
-                    {
-                        for (int j = 0; j < BRICKS_PER_LINE; j++)
-                        {
-                            if (brick[i][j].active) gameOver = false;
-                        }
-                    }
-                }
+            }
         }
     }
     else
@@ -400,6 +421,11 @@ void DrawGame(void)
 void UnloadGame(void)
 {
     UnloadSound(comboSfx);
+    UnloadSound(hitSfx);
+    UnloadSound(extraLife);
+    UnloadSound(loseLife);
+    UnloadSound(beginSfx);
+    UnloadSound(gameOverSfx);
     CloseAudioDevice();
 }
 

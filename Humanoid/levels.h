@@ -2,6 +2,8 @@
 
 #include "arkanoid.h"
 
+// TODO: More levels?
+
 static int brickMap[LEVELS][LINES_OF_BRICKS][BRICKS_PER_LINE] = {
 
 	{ 0 }, // Empty level

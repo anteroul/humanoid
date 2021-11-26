@@ -49,7 +49,13 @@ static Player player = { 0 };
 static Ball ball = { 0 };
 static Brick brick[LINES_OF_BRICKS][BRICKS_PER_LINE] = { 0 };
 static Vector2 brickSize = { 0 };
+
 static Sound comboSfx;
+static Sound hitSfx;
+static Sound beginSfx;
+static Sound gameOverSfx;
+static Sound extraLife;
+static Sound loseLife;
 
 static void StartUp(void);          // Initialize game (application)
 static void InitGame(void);         // Initialize game (gameplay)
