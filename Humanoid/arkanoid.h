@@ -9,7 +9,7 @@
 
 
 typedef enum GameScreen { MENU, SETTINGS, GAMEPLAY, QUIT } GameScreen;
-typedef enum PowerUps { EXTRA_LIFE, WIDE, SHOOT, THREE, SUPERBALL } PowerUps;
+typedef enum PowerUps { NONE, EXTRA_LIFE, WIDE, SHOOT, THREE, SUPERBALL } PowerUps;
 
 typedef struct Player {
     Vector2 position;
@@ -49,6 +49,7 @@ static Player player = { 0 };
 static Ball ball = { 0 };
 static Brick brick[LINES_OF_BRICKS][BRICKS_PER_LINE] = { 0 };
 static Vector2 brickSize = { 0 };
+static Sound comboSfx;
 
 static void StartUp(void);          // Initialize game (application)
 static void InitGame(void);         // Initialize game (gameplay)

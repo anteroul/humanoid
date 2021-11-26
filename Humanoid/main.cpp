@@ -27,11 +27,13 @@ int main(void)
     return 0;
 }
 
+// Set up everything. Load necessary game files.
 void StartUp(void)
 {
     InitAudioDevice();
     SetTargetFPS(GetMonitorRefreshRate(GetCurrentMonitor()));
     gameState = MENU;
+    comboSfx = LoadSound("sounds/coin.wav");
 }
 
 void UpdateMenu(void)
@@ -216,6 +218,7 @@ void UpdateGame(void)
                                     brick[i][j].brickType -= 2;
                                     score += 100 * comboMultiplier;
                                     comboMultiplier++;
+                                    GameManager::PlayComboSfx(&comboSfx, comboMultiplier);
                                 }
                                 ball.speed.y *= -1;
                             }
@@ -229,6 +232,7 @@ void UpdateGame(void)
                                     brick[i][j].brickType -= 2;
                                     score += 100 * comboMultiplier;
                                     comboMultiplier++;
+                                    GameManager::PlayComboSfx(&comboSfx, comboMultiplier);
                                 }
                                 ball.speed.y *= -1;
                             }
@@ -242,6 +246,7 @@ void UpdateGame(void)
                                     brick[i][j].brickType -= 2;
                                     score += 100 * comboMultiplier;
                                     comboMultiplier++;
+                                    GameManager::PlayComboSfx(&comboSfx, comboMultiplier);
                                 }
                                 ball.speed.x *= -1;
                             }
@@ -255,6 +260,7 @@ void UpdateGame(void)
                                     brick[i][j].brickType -= 2;
                                     score += 100 * comboMultiplier;
                                     comboMultiplier++;
+                                    GameManager::PlayComboSfx(&comboSfx, comboMultiplier);
                                 }
                                 ball.speed.x *= -1;
                             }
@@ -262,12 +268,14 @@ void UpdateGame(void)
                     }
                 }
 
+                // TODO: Functionality for rest of the power-ups.
+                // 
                 // Power-up logic
                 switch (powerup)
                 {
-                case 1:
+                case EXTRA_LIFE:
                     player.life++;
-                    powerup = EXTRA_LIFE;
+                    powerup = NONE;
                     break;
                 default:
                     break;
@@ -391,6 +399,7 @@ void DrawGame(void)
 // Unload game variables
 void UnloadGame(void)
 {
+    UnloadSound(comboSfx);
     CloseAudioDevice();
 }
 

@@ -10,6 +10,7 @@ public:
 	static Color GetColor(int combo);
 	static bool onClickEvent(Rectangle btn);
 	static int ActivatePowerUp();
+	static void PlayComboSfx(Sound* sfx, float pitch);
 private:
 	static bool RandomBool();
 };

@@ -50,6 +50,13 @@ int GameManager::ActivatePowerUp()
 	else return 0;
 }
 
+void GameManager::PlayComboSfx(Sound* sfx, float pitch)
+{
+	pitch = 0.02f * pitch + 1.f;
+	SetSoundPitch(*sfx, pitch);
+	PlaySound(*sfx);
+}
+
 bool GameManager::RandomBool()
 {
 	int i = rand() % 100 + 1;
