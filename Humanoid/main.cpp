@@ -37,6 +37,7 @@ void StartUp(void)
     loseLife = LoadSound("sounds/fail.wav");
     beginSfx = LoadSound("sounds/ready.wav");
     gameOverSfx = LoadSound("sounds/game_over.wav");
+    ship = LoadTexture("graphics/ship.png");
     gameState = MENU;
 }
 
@@ -87,7 +88,7 @@ void InitGame(void)
 
     // Initialize player
     player.position = Vector2 { screenWidth / 2, screenHeight * 7 / 8 };
-    player.size = Vector2 { screenWidth / 10, 20 };
+    player.size = Vector2 { (float) ship.width, (float) ship.height};
 
     if (level == 1)
         player.life = PLAYER_MAX_LIFE;
@@ -375,7 +376,7 @@ void DrawGame(void)
         if (!gameOver)
         {
             // Draw player bar
-            DrawRectangle(player.position.x - player.size.x / 2, player.position.y - player.size.y / 2, player.size.x, player.size.y, BLACK);
+            DrawTexture(ship, player.position.x - player.size.x / 2, player.position.y - player.size.y / 2, WHITE);
 
             // Draw player lives
             for (int i = 0; i < player.life; i++) DrawRectangle(20 + 40 * i, screenHeight - 30, 35, 10, RED);
@@ -426,6 +427,7 @@ void UnloadGame(void)
     UnloadSound(loseLife);
     UnloadSound(beginSfx);
     UnloadSound(gameOverSfx);
+    UnloadTexture(ship);
     CloseAudioDevice();
 }
 

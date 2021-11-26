@@ -49,6 +49,7 @@ static Player player = { 0 };
 static Ball ball = { 0 };
 static Brick brick[LINES_OF_BRICKS][BRICKS_PER_LINE] = { 0 };
 static Vector2 brickSize = { 0 };
+static Texture2D ship;
 
 static Sound comboSfx;
 static Sound hitSfx;
