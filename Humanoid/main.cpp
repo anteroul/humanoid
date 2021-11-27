@@ -38,6 +38,7 @@ void StartUp(void)
     beginSfx = LoadSound("sounds/ready.wav");
     gameOverSfx = LoadSound("sounds/game_over.wav");
     ship = LoadTexture("graphics/ship.png");
+    background = LoadTexture("graphics/background.png");
     gameState = MENU;
 }
 
@@ -343,33 +344,34 @@ void DrawGame(void)
     BeginDrawing();
 
     ClearBackground(SKYBLUE);
+    DrawTexture(background, 0, 0, WHITE);
 
     switch (gameState)
     {
     case MENU:              // Draw Main Menu
 
-        DrawRectangle(play_btn.btn_rect.x, play_btn.btn_rect.y, play_btn.btn_rect.width, play_btn.btn_rect.height, RAYWHITE);
-        DrawRectangle(conf_btn.btn_rect.x, conf_btn.btn_rect.y, conf_btn.btn_rect.width, conf_btn.btn_rect.height, RAYWHITE);
-        DrawRectangle(exit_btn.btn_rect.x, exit_btn.btn_rect.y, exit_btn.btn_rect.width, exit_btn.btn_rect.height, RAYWHITE);
+        DrawRectangle(play_btn.btn_rect.x, play_btn.btn_rect.y, play_btn.btn_rect.width, play_btn.btn_rect.height, BLACK);
+        DrawRectangle(conf_btn.btn_rect.x, conf_btn.btn_rect.y, conf_btn.btn_rect.width, conf_btn.btn_rect.height, BLACK);
+        DrawRectangle(exit_btn.btn_rect.x, exit_btn.btn_rect.y, exit_btn.btn_rect.width, exit_btn.btn_rect.height, BLACK);
 
-        DrawText(play_btn.text, play_btn.btn_pos.x, play_btn.btn_pos.y, 40, BLACK);
-        DrawText(conf_btn.text, conf_btn.btn_pos.x, conf_btn.btn_pos.y, 40, BLACK);
-        DrawText(exit_btn.text, exit_btn.btn_pos.x, exit_btn.btn_pos.y, 40, BLACK);
+        DrawText(play_btn.text, play_btn.btn_pos.x, play_btn.btn_pos.y, 40, GREEN);
+        DrawText(conf_btn.text, conf_btn.btn_pos.x, conf_btn.btn_pos.y, 40, GREEN);
+        DrawText(exit_btn.text, exit_btn.btn_pos.x, exit_btn.btn_pos.y, 40, GREEN);
 
         break;
     case SETTINGS:          // Draw Settings Screen
 
         if (frameLimiter.enabled) DrawText(frameLimiter.text, frameLimiter.btn_rect.x, frameLimiter.btn_rect.y, 20, RED);
-        else DrawText(frameLimiter.text, frameLimiter.btn_rect.x, frameLimiter.btn_rect.y, 20, BLACK);
+        else DrawText(frameLimiter.text, frameLimiter.btn_rect.x, frameLimiter.btn_rect.y, 20, WHITE);
 
         if (fullScreen.enabled) DrawText(fullScreen.text, fullScreen.btn_rect.x, fullScreen.btn_rect.y, 20, RED);
-        else DrawText(fullScreen.text, fullScreen.btn_rect.x, fullScreen.btn_rect.y, 20, BLACK);
+        else DrawText(fullScreen.text, fullScreen.btn_rect.x, fullScreen.btn_rect.y, 20, WHITE);
 
-        DrawRectangle(play_btn_copy.btn_rect.x, play_btn_copy.btn_rect.y, play_btn_copy.btn_rect.width, play_btn_copy.btn_rect.height, RAYWHITE);
-        DrawRectangle(exit_btn.btn_rect.x, exit_btn.btn_rect.y, exit_btn.btn_rect.width, exit_btn.btn_rect.height, RAYWHITE);
+        DrawRectangle(play_btn_copy.btn_rect.x, play_btn_copy.btn_rect.y, play_btn_copy.btn_rect.width, play_btn_copy.btn_rect.height, BLACK);
+        DrawRectangle(exit_btn.btn_rect.x, exit_btn.btn_rect.y, exit_btn.btn_rect.width, exit_btn.btn_rect.height, BLACK);
 
-        DrawText(play_btn_copy.text, play_btn_copy.btn_pos.x, play_btn_copy.btn_pos.y, 40, BLACK);
-        DrawText(exit_btn.text, exit_btn.btn_pos.x, exit_btn.btn_pos.y, 40, BLACK);
+        DrawText(play_btn_copy.text, play_btn_copy.btn_pos.x, play_btn_copy.btn_pos.y, 40, GREEN);
+        DrawText(exit_btn.text, exit_btn.btn_pos.x, exit_btn.btn_pos.y, 40, GREEN);
 
         break;
     case GAMEPLAY:          // Draw Gameplay
@@ -395,18 +397,18 @@ void DrawGame(void)
             }
 
             // Draw score
-            DrawText(TextFormat("%04i", score), screenWidth - 150, screenHeight - 50, 40, BLACK);
+            DrawText(TextFormat("%04i", score), screenWidth - 150, screenHeight - 50, 40, GREEN);
 
             if (comboMultiplier > 2)
                 DrawText(TextFormat("%01ix Combo!", comboMultiplier - 1), GetScreenWidth() / 2 - 50, GetScreenHeight() / 2, 20, GameManager::GetColor(comboMultiplier));
 
-            if (pause) DrawText("GAME PAUSED", screenWidth / 2 - MeasureText("GAME PAUSED", 40) / 2, screenHeight / 2 - 40, 40, GRAY);
+            if (pause) DrawText("GAME PAUSED", screenWidth / 2 - MeasureText("GAME PAUSED", 40) / 2, screenHeight / 2 - 40, 40, WHITE);
         }
         else
         {
-            DrawText("PRESS [ENTER] TO PLAY AGAIN", GetScreenWidth() / 2 - MeasureText("PRESS [ENTER] TO PLAY AGAIN", 20) / 2, GetScreenHeight() / 2 - 80, 20, GRAY);
-            DrawText("PRESS [BACKSPACE] TO RETURN TO MAIN MENU", GetScreenWidth() / 2 - MeasureText("PRESS [BACKSPACE] TO RETURN TO MAIN MENU", 20) / 2, GetScreenHeight() / 2 - 50, 20, GRAY);
-            DrawText(TextFormat("%04i", score), GetScreenWidth() / 2 - MeasureText(TextFormat("%04i", score), 40) / 2, GetScreenHeight() / 2, 40, BLACK);
+            DrawText("PRESS [ENTER] TO PLAY AGAIN", GetScreenWidth() / 2 - MeasureText("PRESS [ENTER] TO PLAY AGAIN", 20) / 2, GetScreenHeight() / 2 - 80, 20, GREEN);
+            DrawText("PRESS [BACKSPACE] TO RETURN TO MAIN MENU", GetScreenWidth() / 2 - MeasureText("PRESS [BACKSPACE] TO RETURN TO MAIN MENU", 20) / 2, GetScreenHeight() / 2 - 50, 20, GREEN);
+            DrawText(TextFormat("%04i", score), GetScreenWidth() / 2 - MeasureText(TextFormat("%04i", score), 40) / 2, GetScreenHeight() / 2, 40, GREEN);
         }
 
         break;
@@ -428,6 +430,7 @@ void UnloadGame(void)
     UnloadSound(beginSfx);
     UnloadSound(gameOverSfx);
     UnloadTexture(ship);
+    UnloadTexture(background);
     CloseAudioDevice();
 }
 
