@@ -31,6 +31,7 @@ void StartUp(void)
 {
     InitAudioDevice();
     SetTargetFPS(GetMonitorRefreshRate(GetCurrentMonitor()));
+    btnSfx = LoadSound("sounds/button.wav");
     comboSfx = LoadSound("sounds/coin.wav");
     hitSfx = LoadSound("sounds/hit.wav");
     extraLife = LoadSound("sounds/1up.wav");
@@ -46,16 +47,16 @@ void UpdateMenu(void)
 {
     if (gameState == MENU)
     {
-        if (GameManager::onClickEvent(play_btn.btn_rect))
+        if (GameManager::onClickEvent(play_btn.btn_rect, &btnSfx))
             gameState = GAMEPLAY;
-        if (GameManager::onClickEvent(conf_btn.btn_rect))
+        if (GameManager::onClickEvent(conf_btn.btn_rect, &btnSfx))
             gameState = SETTINGS;
-        if (GameManager::onClickEvent(exit_btn.btn_rect))
+        if (GameManager::onClickEvent(exit_btn.btn_rect, &btnSfx))
             gameState = QUIT;
     }
     else if (gameState == SETTINGS)
     {
-        if (GameManager::onClickEvent(fullScreen.btn_rect))
+        if (GameManager::onClickEvent(fullScreen.btn_rect, &btnSfx))
         {
             if (!fullScreen.enabled)
                 fullScreen.enabled = true;
@@ -63,7 +64,7 @@ void UpdateMenu(void)
                 fullScreen.enabled = false;
             ToggleFullscreen();
         }
-        if (GameManager::onClickEvent(frameLimiter.btn_rect))
+        if (GameManager::onClickEvent(frameLimiter.btn_rect, &btnSfx))
         {
             if (!frameLimiter.enabled)
             {
@@ -76,9 +77,9 @@ void UpdateMenu(void)
                 SetTargetFPS(GetMonitorRefreshRate(GetCurrentMonitor()));
             }
         }
-        if (GameManager::onClickEvent(play_btn_copy.btn_rect))
+        if (GameManager::onClickEvent(play_btn_copy.btn_rect, &btnSfx))
             gameState = GAMEPLAY;
-        if (GameManager::onClickEvent(exit_btn.btn_rect))
+        if (GameManager::onClickEvent(exit_btn.btn_rect, &btnSfx))
             gameState = QUIT;
     }
 }
@@ -127,14 +128,18 @@ void UpdateGame(void)
 {
     if (!gameOver)
     {
-        if (IsKeyPressed('P')) pause = !pause;
-
-        if (level == LEVELS) level = 1;
+        if (level == LEVELS) gameOver = true;
 
         if (bricks <= 0)
         {
             level++;
             levelReady = false;
+        }
+
+        if (IsKeyPressed('P'))
+        {
+            pause = !pause;
+            PlaySound(btnSfx);
         }
 
         if (!pause)
@@ -423,6 +428,7 @@ void DrawGame(void)
 // Unload game variables
 void UnloadGame(void)
 {
+    UnloadSound(btnSfx);
     UnloadSound(comboSfx);
     UnloadSound(hitSfx);
     UnloadSound(extraLife);

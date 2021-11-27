@@ -32,12 +32,15 @@ Color GameManager::GetColor(int combo)
 	}
 }
 
-bool GameManager::onClickEvent(Rectangle btn)
+bool GameManager::onClickEvent(Rectangle btn, Sound* sfx)
 {
 	if (IsMouseButtonReleased(0))
 	{
 		if (CheckCollisionPointRec(GetMousePosition(), btn))
+		{
+			PlaySound(*sfx);
 			return true;
+		}
 		else
 			return false;
 	}

@@ -23,3 +23,5 @@ static Button play_btn_copy = { "   Play  ", screenWidth / 2.5f, screenHeight / 
 
 static ToggleButton frameLimiter = { false, "Frame Limiter on/off", screenWidth / 3, screenHeight / 4, screenWidth / 3, screenHeight / 22 };
 static ToggleButton fullScreen = { false, "Toggle Fullsceen on/off", screenWidth / 3, screenHeight / 3, screenWidth / 3, screenHeight / 22 };
+
+static Sound btnSfx;
