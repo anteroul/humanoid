@@ -10,7 +10,7 @@
 
 
 typedef enum GameScreen { MENU, SETTINGS, GAMEPLAY, QUIT } GameScreen;
-typedef enum PowerUps { NONE, EXTRA_LIFE, WIDE, SHOOT, STICKY, SUPERBALL } PowerUps;
+typedef enum PowerUps { NONE, EXTRA_LIFE, WIDE, SHOOT, MAGNETIC, SUPERBALL } PowerUps;
 
 typedef struct Player {
     Vector2 position;
@@ -48,6 +48,7 @@ static int comboMultiplier = 1;
 static int powerup = 0;
 static int sizeMultiplier = 1;
 static int ammo = 29;
+static int damage = 2;
 
 static bool levelReady = false;
 static bool gameOver = false;

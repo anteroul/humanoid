@@ -103,6 +103,9 @@ void InitGame(void)
 
     comboMultiplier = 1;
     powerup = 0;
+    sizeMultiplier = 1;
+    stickyMode = false;
+    superBallMode = false;
 
     // Initialize bricks
     int initialDownPosition = 50;
@@ -139,6 +142,9 @@ void UpdateGame(void)
         if (level == LEVELS) gameOver = true;
 
         player.size.x = ship.width * sizeMultiplier;
+
+        if (!superBallMode) damage = 2;
+        else damage = 4;
 
         if (bricks <= 0)
         {
@@ -193,6 +199,11 @@ void UpdateGame(void)
             // Ball movement logic
             if (ball.active)
             {
+                if (stickyMode)
+                {
+                    if (ball.position.x > player.position.x) ball.position.x -= 0.75f;
+                    if (ball.position.x < player.position.x) ball.position.x += 0.75f;
+                }
                 ball.position.x += ball.speed.x;
                 ball.position.y += ball.speed.y;
             }
@@ -237,11 +248,6 @@ void UpdateGame(void)
                     ball.speed.x = (ball.position.x - player.position.x) / (player.size.x / 2) * 5;
                     comboMultiplier = 1;
                     PlaySound(hitSfx);
-                }
-                if (stickyMode)
-                {
-                    ball.speed = { 0, 0 };
-                    ball.active = false;
                 }
             }
 
@@ -296,13 +302,13 @@ void UpdateGame(void)
                         {
                             if (brick[i][j].brickType != 5)
                             {
-                                brick[i][j].brickType -= 2;
+                                brick[i][j].brickType -= damage;
                                 score += 100 * comboMultiplier;
                                 comboMultiplier++;
                                 GameManager::PlayComboSfx(comboSfx, comboMultiplier);
                             }
                             else PlaySound(hitSfx);
-                            if (!superBallMode) ball.speed.y *= -1;
+                            ball.speed.y *= -1;
                         }
                         // Hit above
                         else if (((ball.position.y + ball.radius) >= (brick[i][j].position.y - brickSize.y / 2)) &&
@@ -311,13 +317,13 @@ void UpdateGame(void)
                         {
                             if (brick[i][j].brickType != 5)
                             {
-                                brick[i][j].brickType -= 2;
+                                brick[i][j].brickType -= damage;
                                 score += 100 * comboMultiplier;
                                 comboMultiplier++;
                                 GameManager::PlayComboSfx(comboSfx, comboMultiplier);
                             }
                             else PlaySound(hitSfx);
-                            if (!superBallMode) ball.speed.y *= -1;
+                            ball.speed.y *= -1;
                         }
                         // Hit left
                         else if (((ball.position.x + ball.radius) >= (brick[i][j].position.x - brickSize.x / 2)) &&
@@ -326,13 +332,13 @@ void UpdateGame(void)
                         {
                             if (brick[i][j].brickType != 5)
                             {
-                                brick[i][j].brickType -= 2;
+                                brick[i][j].brickType -= damage;
                                 score += 100 * comboMultiplier;
                                 comboMultiplier++;
                                 GameManager::PlayComboSfx(comboSfx, comboMultiplier);
                             }
                             else PlaySound(hitSfx);
-                            if (!superBallMode) ball.speed.x *= -1;
+                            ball.speed.x *= -1;
                         }
                         // Hit right
                         else if (((ball.position.x - ball.radius) <= (brick[i][j].position.x + brickSize.x / 2)) &&
@@ -341,13 +347,13 @@ void UpdateGame(void)
                         {
                             if (brick[i][j].brickType != 5)
                             {
-                                brick[i][j].brickType -= 2;
+                                brick[i][j].brickType -= damage;
                                 score += 100 * comboMultiplier;
                                 comboMultiplier++;
                                 GameManager::PlayComboSfx(comboSfx, comboMultiplier);
                             }
                             else PlaySound(hitSfx);
-                            if (!superBallMode) ball.speed.x *= -1;
+                            ball.speed.x *= -1;
                         }
                     }
                 }
@@ -365,6 +371,8 @@ void UpdateGame(void)
                 break;
             case WIDE:
                 sizeMultiplier = 2;
+                stickyMode = false;
+                superBallMode = false;
                 PlaySound(extraLife);
                 powerup = NONE;
                 break;
@@ -373,13 +381,15 @@ void UpdateGame(void)
                 PlaySound(extraLife);
                 powerup = NONE;
                 break;
-            case STICKY:
+            case MAGNETIC:
+                sizeMultiplier = 1;
                 superBallMode = false;
                 stickyMode = true;
                 PlaySound(extraLife);
                 powerup = NONE;
                 break;
             case SUPERBALL:
+                sizeMultiplier = 1;
                 stickyMode = false;
                 superBallMode = true;
                 PlaySound(extraLife);
