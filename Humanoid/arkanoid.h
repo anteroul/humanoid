@@ -2,14 +2,15 @@
 
 #include "raylib.h"
 
-#define PLAYER_MAX_LIFE         5
+#define DEFAULT_LIFE            3
 #define LEVELS                  6
 #define LINES_OF_BRICKS         5
 #define BRICKS_PER_LINE        15
+#define MAX_AMMO               30
 
 
 typedef enum GameScreen { MENU, SETTINGS, GAMEPLAY, QUIT } GameScreen;
-typedef enum PowerUps { NONE, EXTRA_LIFE, WIDE, SHOOT, THREE, SUPERBALL } PowerUps;
+typedef enum PowerUps { NONE, EXTRA_LIFE, WIDE, SHOOT, STICKY, SUPERBALL } PowerUps;
 
 typedef struct Player {
     Vector2 position;
@@ -31,6 +32,11 @@ typedef struct Brick {
     Color color;
 } Brick;
 
+typedef struct Projectile {
+    Rectangle rect;
+    bool active;
+} Projectile;
+
 static const int screenWidth = 800;
 static const int screenHeight = 600;
 
@@ -40,10 +46,14 @@ static int level = 1;
 static int score = 0;
 static int comboMultiplier = 1;
 static int powerup = 0;
+static int sizeMultiplier = 1;
+static int ammo = 29;
 
 static bool levelReady = false;
 static bool gameOver = false;
 static bool pause = false;
+static bool stickyMode = false;
+static bool superBallMode = false;
 
 static Player player = { 0 };
 static Ball ball = { 0 };
@@ -51,6 +61,7 @@ static Brick brick[LINES_OF_BRICKS][BRICKS_PER_LINE] = { 0 };
 static Vector2 brickSize = { 0 };
 static Texture2D ship;
 static Texture2D background;
+static Projectile projectile[MAX_AMMO] = { 0 };
 
 static Sound comboSfx;
 static Sound hitSfx;
@@ -58,6 +69,7 @@ static Sound beginSfx;
 static Sound gameOverSfx;
 static Sound extraLife;
 static Sound loseLife;
+static Sound shoot;
 
 static void StartUp(void);          // Initialize game (application)
 static void InitGame(void);         // Initialize game (gameplay)

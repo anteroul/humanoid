@@ -2,7 +2,6 @@
 #include "GameManager.h"
 #include "GUI.h"
 #include "levels.h"
-#include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
@@ -38,6 +37,7 @@ void StartUp(void)
     loseLife = LoadSound("sounds/fail.wav");
     beginSfx = LoadSound("sounds/ready.wav");
     gameOverSfx = LoadSound("sounds/game_over.wav");
+    shoot = LoadSound("sounds/shoot.wav");
     ship = LoadTexture("graphics/ship.png");
     background = LoadTexture("graphics/background.png");
     gameState = MENU;
@@ -93,7 +93,7 @@ void InitGame(void)
     player.size = Vector2 { (float) ship.width, (float) ship.height};
 
     if (level == 1)
-        player.life = PLAYER_MAX_LIFE;
+        player.life = DEFAULT_LIFE;
 
     // Initialize ball
     ball.position = Vector2 { screenWidth / 2, screenHeight * 7 / 8 - 30 };
@@ -119,6 +119,14 @@ void InitGame(void)
                 bricks++;
         }
     }
+
+    if (ammo <= 0)
+    {
+        for (int i = 0; i < MAX_AMMO; i++)
+        {
+            projectile[i].active = false;
+        }
+    }
     PlaySound(beginSfx);
     levelReady = true;
 }
@@ -129,6 +137,8 @@ void UpdateGame(void)
     if (!gameOver)
     {
         if (level == LEVELS) gameOver = true;
+
+        player.size.x = ship.width * sizeMultiplier;
 
         if (bricks <= 0)
         {
@@ -159,6 +169,26 @@ void UpdateGame(void)
                     ball.speed = Vector2{ 0, -5 };
                 }
             }
+            else
+            {
+                if (IsKeyPressed(KEY_SPACE) && ammo > 0)
+                {
+                    projectile[ammo].active = true;
+                    projectile[ammo].rect = { player.position.x - 5, player.position.y, 5, 10 };
+                    ammo--;
+                    PlaySound(shoot);
+                }
+            }
+
+            // Projectile logic
+            for (int i = 0; i < 30; i++)
+            {
+                if (projectile[i].active)
+                {
+                    if (projectile[i].rect.y < 0) projectile[i].active = false;
+                    projectile[i].rect.y -= 15;
+                }
+            }
 
             // Ball movement logic
             if (ball.active)
@@ -186,8 +216,12 @@ void UpdateGame(void)
             {
                 ball.speed = Vector2{ 0, 0 };
                 ball.active = false;
+                stickyMode = false;
+                superBallMode = false;
                 comboMultiplier = 1;
                 player.life--;
+                sizeMultiplier = 1;
+                ammo = 0;
                 PlaySound(loseLife);
             }
 
@@ -203,6 +237,11 @@ void UpdateGame(void)
                     ball.speed.x = (ball.position.x - player.position.x) / (player.size.x / 2) * 5;
                     comboMultiplier = 1;
                     PlaySound(hitSfx);
+                }
+                if (stickyMode)
+                {
+                    ball.speed = { 0, 0 };
+                    ball.active = false;
                 }
             }
 
@@ -238,6 +277,18 @@ void UpdateGame(void)
                             powerup = GameManager::ActivatePowerUp();
                         }
 
+                        // Projectile hit
+                        for (int k = 0; k < 30; k++)
+                        {
+                            if (CheckCollisionRecs(projectile[k].rect, { brick[i][j].position.x, brick[i][j].position.y, brickSize.x, brickSize.y }) && projectile[k].active)
+                            {
+                                brick[i][j].brickType -= 2;
+                                score += 100;
+                                GameManager::PlayComboSfx(comboSfx, 1);
+                                projectile[k].active = false;
+                            }
+                        }
+
                         // Hit below
                         if (((ball.position.y - ball.radius) <= (brick[i][j].position.y + brickSize.y / 2)) &&
                             ((ball.position.y - ball.radius) > (brick[i][j].position.y + brickSize.y / 2 + ball.speed.y)) &&
@@ -251,7 +302,7 @@ void UpdateGame(void)
                                 GameManager::PlayComboSfx(comboSfx, comboMultiplier);
                             }
                             else PlaySound(hitSfx);
-                            ball.speed.y *= -1;
+                            if (!superBallMode) ball.speed.y *= -1;
                         }
                         // Hit above
                         else if (((ball.position.y + ball.radius) >= (brick[i][j].position.y - brickSize.y / 2)) &&
@@ -266,7 +317,7 @@ void UpdateGame(void)
                                 GameManager::PlayComboSfx(comboSfx, comboMultiplier);
                             }
                             else PlaySound(hitSfx);
-                            ball.speed.y *= -1;
+                            if (!superBallMode) ball.speed.y *= -1;
                         }
                         // Hit left
                         else if (((ball.position.x + ball.radius) >= (brick[i][j].position.x - brickSize.x / 2)) &&
@@ -281,7 +332,7 @@ void UpdateGame(void)
                                 GameManager::PlayComboSfx(comboSfx, comboMultiplier);
                             }
                             else PlaySound(hitSfx);
-                            ball.speed.x *= -1;
+                            if (!superBallMode) ball.speed.x *= -1;
                         }
                         // Hit right
                         else if (((ball.position.x - ball.radius) <= (brick[i][j].position.x + brickSize.x / 2)) &&
@@ -296,19 +347,41 @@ void UpdateGame(void)
                                 GameManager::PlayComboSfx(comboSfx, comboMultiplier);
                             }
                             else PlaySound(hitSfx);
-                            ball.speed.x *= -1;
+                            if (!superBallMode) ball.speed.x *= -1;
                         }
                     }
                 }
             }
 
-            // TODO: Functionality for rest of the power-ups.
+            // TODO: Improve power-ups.
             // 
             // Power-up logic
             switch (powerup)
             {
             case EXTRA_LIFE:
                 player.life++;
+                PlaySound(extraLife);
+                powerup = NONE;
+                break;
+            case WIDE:
+                sizeMultiplier = 2;
+                PlaySound(extraLife);
+                powerup = NONE;
+                break;
+            case SHOOT:
+                ammo = MAX_AMMO - 1;
+                PlaySound(extraLife);
+                powerup = NONE;
+                break;
+            case STICKY:
+                superBallMode = false;
+                stickyMode = true;
+                PlaySound(extraLife);
+                powerup = NONE;
+                break;
+            case SUPERBALL:
+                stickyMode = false;
+                superBallMode = true;
                 PlaySound(extraLife);
                 powerup = NONE;
                 break;
@@ -394,13 +467,20 @@ void DrawGame(void)
         if (!gameOver)
         {
             // Draw player bar
-            DrawTexture(ship, player.position.x - player.size.x / 2, player.position.y - player.size.y / 2, WHITE);
+            if (!stickyMode)
+                DrawTextureRec(ship, {0, 0, player.size.x, player.size.y}, { player.position.x - player.size.x / 2, player.position.y - player.size.y / 2 }, WHITE);
+            else
+                DrawTextureRec(ship, { 0, 0, player.size.x, player.size.y }, { player.position.x - player.size.x / 2, player.position.y - player.size.y / 2 }, GREEN);
 
             // Draw player lives
             for (int i = 0; i < player.life; i++) DrawRectangle(20 + 40 * i, screenHeight - 30, 35, 10, RED);
 
+            // Draw projectiles
+            for (int i = 0; i < 30; i++) if (projectile[i].active) DrawRectangle(projectile[i].rect.x, projectile[i].rect.y, projectile[i].rect.width, projectile[i].rect.height, WHITE);
+
             // Draw ball
-            DrawCircleV(ball.position, ball.radius, MAROON);
+            if (!superBallMode) DrawCircleV(ball.position, ball.radius, WHITE);
+            else DrawCircleV(ball.position, ball.radius, MAROON);
 
             // Draw bricks
             for (int i = 0; i < LINES_OF_BRICKS; i++)
@@ -446,6 +526,7 @@ void UnloadGame(void)
     UnloadSound(loseLife);
     UnloadSound(beginSfx);
     UnloadSound(gameOverSfx);
+    UnloadSound(shoot);
     UnloadTexture(ship);
     UnloadTexture(background);
     CloseAudioDevice();
