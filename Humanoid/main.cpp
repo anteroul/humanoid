@@ -47,16 +47,16 @@ void UpdateMenu(void)
 {
     if (gameState == MENU)
     {
-        if (GameManager::onClickEvent(play_btn.btn_rect, &btnSfx))
+        if (GameManager::onClickEvent(play_btn.btn_rect, btnSfx))
             gameState = GAMEPLAY;
-        if (GameManager::onClickEvent(conf_btn.btn_rect, &btnSfx))
+        if (GameManager::onClickEvent(conf_btn.btn_rect, btnSfx))
             gameState = SETTINGS;
-        if (GameManager::onClickEvent(exit_btn.btn_rect, &btnSfx))
+        if (GameManager::onClickEvent(exit_btn.btn_rect, btnSfx))
             gameState = QUIT;
     }
     else if (gameState == SETTINGS)
     {
-        if (GameManager::onClickEvent(fullScreen.btn_rect, &btnSfx))
+        if (GameManager::onClickEvent(fullScreen.btn_rect, btnSfx))
         {
             if (!fullScreen.enabled)
                 fullScreen.enabled = true;
@@ -64,7 +64,7 @@ void UpdateMenu(void)
                 fullScreen.enabled = false;
             ToggleFullscreen();
         }
-        if (GameManager::onClickEvent(frameLimiter.btn_rect, &btnSfx))
+        if (GameManager::onClickEvent(frameLimiter.btn_rect, btnSfx))
         {
             if (!frameLimiter.enabled)
             {
@@ -77,9 +77,9 @@ void UpdateMenu(void)
                 SetTargetFPS(GetMonitorRefreshRate(GetCurrentMonitor()));
             }
         }
-        if (GameManager::onClickEvent(play_btn_copy.btn_rect, &btnSfx))
+        if (GameManager::onClickEvent(play_btn_copy.btn_rect, btnSfx))
             gameState = GAMEPLAY;
-        if (GameManager::onClickEvent(exit_btn.btn_rect, &btnSfx))
+        if (GameManager::onClickEvent(exit_btn.btn_rect, btnSfx))
             gameState = QUIT;
     }
 }
@@ -214,14 +214,25 @@ void UpdateGame(void)
                     if (brick[i][j].active)
                     {
                         // Brick colors
-                        if (brick[i][j].brickType == 1) brick[i][j].color = YELLOW;
-                        else if (brick[i][j].brickType == 2) brick[i][j].color = GREEN;
-                        else if (brick[i][j].brickType == 3) brick[i][j].color = BLUE;
-                        else if (brick[i][j].brickType == 4) brick[i][j].color = MAGENTA;
-                        else if (brick[i][j].brickType == 5) brick[i][j].color = DARKGRAY;
-                        // Destroy brick if brick type is downgraded below type 1
-                        else
+                        switch (brick[i][j].brickType)
                         {
+                        case 1:
+                            brick[i][j].color = YELLOW;
+                            break;
+                        case 2:
+                            brick[i][j].color = GREEN;
+                            break;
+                        case 3:
+                            brick[i][j].color = BLUE;
+                            break;
+                        case 4:
+                            brick[i][j].color = MAGENTA;
+                            break;
+                        case 5:
+                            brick[i][j].color = DARKGRAY;
+                            break;
+                        default:
+                            // Destroy brick if brick type is downgraded below type 1
                             bricks--;
                             brick[i][j].active = false;
                             powerup = GameManager::ActivatePowerUp();
@@ -237,7 +248,7 @@ void UpdateGame(void)
                                 brick[i][j].brickType -= 2;
                                 score += 100 * comboMultiplier;
                                 comboMultiplier++;
-                                GameManager::PlayComboSfx(&comboSfx, comboMultiplier);
+                                GameManager::PlayComboSfx(comboSfx, comboMultiplier);
                             }
                             else PlaySound(hitSfx);
                             ball.speed.y *= -1;
@@ -252,7 +263,7 @@ void UpdateGame(void)
                                 brick[i][j].brickType -= 2;
                                 score += 100 * comboMultiplier;
                                 comboMultiplier++;
-                                GameManager::PlayComboSfx(&comboSfx, comboMultiplier);
+                                GameManager::PlayComboSfx(comboSfx, comboMultiplier);
                             }
                             else PlaySound(hitSfx);
                             ball.speed.y *= -1;
@@ -267,7 +278,7 @@ void UpdateGame(void)
                                 brick[i][j].brickType -= 2;
                                 score += 100 * comboMultiplier;
                                 comboMultiplier++;
-                                GameManager::PlayComboSfx(&comboSfx, comboMultiplier);
+                                GameManager::PlayComboSfx(comboSfx, comboMultiplier);
                             }
                             else PlaySound(hitSfx);
                             ball.speed.x *= -1;
@@ -282,7 +293,7 @@ void UpdateGame(void)
                                 brick[i][j].brickType -= 2;
                                 score += 100 * comboMultiplier;
                                 comboMultiplier++;
-                                GameManager::PlayComboSfx(&comboSfx, comboMultiplier);
+                                GameManager::PlayComboSfx(comboSfx, comboMultiplier);
                             }
                             else PlaySound(hitSfx);
                             ball.speed.x *= -1;
