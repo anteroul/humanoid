@@ -139,9 +139,14 @@ void UpdateGame(void)
 {
     if (!gameOver)
     {
-        if (level == LEVELS) gameOver = true;
-
         player.size.x = ship.width * sizeMultiplier;
+
+        if (level == LEVELS)
+        {
+            if (score > GameManager::ReadScore())
+                GameManager::SubmitScore(score);
+            gameOver = true;
+        }
 
         if (!superBallMode) damage = 2;
         else damage = 4;
@@ -402,6 +407,8 @@ void UpdateGame(void)
             // Game over logic
             if (player.life <= 0 && gameOver == false)
             {
+                if (score > GameManager::ReadScore())
+                    GameManager::SubmitScore(score);
                 gameOver = true;
                 PlaySound(gameOverSfx);
             }
@@ -514,7 +521,11 @@ void DrawGame(void)
         {
             DrawText("PRESS [ENTER] TO PLAY AGAIN", GetScreenWidth() / 2 - MeasureText("PRESS [ENTER] TO PLAY AGAIN", 20) / 2, GetScreenHeight() / 2 - 80, 20, GREEN);
             DrawText("PRESS [BACKSPACE] TO RETURN TO MAIN MENU", GetScreenWidth() / 2 - MeasureText("PRESS [BACKSPACE] TO RETURN TO MAIN MENU", 20) / 2, GetScreenHeight() / 2 - 50, 20, GREEN);
-            DrawText(TextFormat("%04i", score), GetScreenWidth() / 2 - MeasureText(TextFormat("%04i", score), 40) / 2, GetScreenHeight() / 2, 40, GREEN);
+
+            if (score >= GameManager::ReadScore())
+                DrawText("NEW HIGH SCORE!", GetScreenWidth() / 2 - MeasureText("NEW HIGH SCORE!", 20) / 2, GetScreenHeight() / 2, 20, WHITE);
+
+            DrawText(TextFormat("%04i", score), GetScreenWidth() / 2 - MeasureText(TextFormat("%04i", score), 40) / 2, GetScreenHeight() / 2 + 40, 40, GREEN);
         }
 
         break;

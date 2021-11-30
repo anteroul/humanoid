@@ -1,5 +1,6 @@
 #include "GameManager.h"
 #include "stdlib.h"
+#include "cstdio"
 
 GameManager::GameManager()
 {
@@ -58,6 +59,25 @@ void GameManager::PlayComboSfx(Sound& sfx, float pitch)
 	pitch = 0.02f * pitch + 1.f;
 	SetSoundPitch(sfx, pitch);
 	PlaySound(sfx);
+}
+
+void GameManager::SubmitScore(int score)
+{
+	FILE* lboard;
+	lboard = fopen("data/leaderboards.bin", "wb");
+	fseek(lboard, 0, SEEK_END);
+	fwrite(&score, sizeof(int), 1, lboard);
+	fclose(lboard);
+}
+
+int GameManager::ReadScore()
+{
+	FILE* lboard;
+	int score;
+	lboard = fopen("data/leaderboards.bin", "rb");
+	fread((char*)&score, sizeof(int), 1, lboard);
+	fclose(lboard);
+	return score;
 }
 
 bool GameManager::RandomBool()

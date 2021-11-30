@@ -47,7 +47,7 @@ static int score = 0;
 static int comboMultiplier = 1;
 static int powerup = 0;
 static int sizeMultiplier = 1;
-static int ammo = 29;
+static int ammo = 0;
 static int damage = 2;
 
 static bool levelReady = false;
