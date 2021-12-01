@@ -524,6 +524,8 @@ void DrawGame(void)
 
             if (score >= GameManager::ReadScore())
                 DrawText("NEW HIGH SCORE!", GetScreenWidth() / 2 - MeasureText("NEW HIGH SCORE!", 20) / 2, GetScreenHeight() / 2, 20, WHITE);
+            else
+                DrawText(TextFormat("your high score: %04i", GameManager::ReadScore()), GetScreenWidth() / 2 - 120, GetScreenHeight() / 2, 20, GREEN);
 
             DrawText(TextFormat("%04i", score), GetScreenWidth() / 2 - MeasureText(TextFormat("%04i", score), 40) / 2, GetScreenHeight() / 2 + 40, 40, GREEN);
         }
