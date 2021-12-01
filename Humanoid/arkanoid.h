@@ -62,6 +62,7 @@ static Brick brick[LINES_OF_BRICKS][BRICKS_PER_LINE] = { 0 };
 static Vector2 brickSize = { 0 };
 static Texture2D ship;
 static Texture2D background;
+static Texture2D turret;
 static Projectile projectile[MAX_AMMO] = { 0 };
 
 static Sound comboSfx;

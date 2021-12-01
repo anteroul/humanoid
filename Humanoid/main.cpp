@@ -1,5 +1,5 @@
 // (C) Uljas Antero Lindell 2021
-// Version 0.9.5 Alpha
+// Version 0.9.6 Alpha
 
 
 #include "arkanoid.h"
@@ -44,6 +44,7 @@ void StartUp(void)
     shoot = LoadSound("sounds/shoot.wav");
     ship = LoadTexture("graphics/ship.png");
     background = LoadTexture("graphics/background.png");
+    turret = LoadTexture("graphics/turret.png");
     gameState = MENU;
 }
 
@@ -189,7 +190,7 @@ void UpdateGame(void)
                 if (IsKeyPressed(KEY_SPACE) && ammo > 0)
                 {
                     projectile[ammo].active = true;
-                    projectile[ammo].rect = { player.position.x - 5, player.position.y, 5, 10 };
+                    projectile[ammo].rect = { player.position.x - 3, player.position.y - 30, 5, 10 };
                     ammo--;
                     PlaySound(shoot);
                 }
@@ -497,6 +498,9 @@ void DrawGame(void)
             else
                 DrawTextureRec(ship, { 0, 0, player.size.x, player.size.y }, { player.position.x - player.size.x / 2, player.position.y - player.size.y / 2 }, GREEN);
 
+            if (ammo > 0)
+                DrawTexture(turret, player.position.x - turret.width / 2, player.position.y - 30, WHITE);
+
             // Draw player lives
             for (int i = 0; i < player.life; i++) DrawRectangle(20 + 40 * i, screenHeight - 30, 35, 10, RED);
 
@@ -560,6 +564,7 @@ void UnloadGame(void)
     UnloadSound(shoot);
     UnloadTexture(ship);
     UnloadTexture(background);
+    UnloadTexture(turret);
     CloseAudioDevice();
 }
 
