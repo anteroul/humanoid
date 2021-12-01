@@ -25,3 +25,5 @@ static ToggleButton frameLimiter = { false, "Frame Limiter on/off", screenWidth 
 static ToggleButton fullScreen = { false, "Toggle Fullsceen on/off", screenWidth / 3, screenHeight / 3, screenWidth / 3, screenHeight / 22 };
 
 static Sound btnSfx;
+
+static Image appIcon;

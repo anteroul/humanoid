@@ -14,6 +14,10 @@
 int main(void)
 {
     InitWindow(screenWidth, screenHeight, "Humanoid");
+
+    appIcon = LoadImage("icons/icon.png");
+    SetWindowIcon(appIcon);
+
     StartUp();
     
     while (!WindowShouldClose())    // Detect window close button or ESC key
@@ -471,7 +475,7 @@ void DrawGame(void)
         DrawText(conf_btn.text, conf_btn.btn_pos.x, conf_btn.btn_pos.y, 40, GREEN);
         DrawText(exit_btn.text, exit_btn.btn_pos.x, exit_btn.btn_pos.y, 40, GREEN);
         
-        DrawText("v0.9.5 alpha", 5, GetScreenHeight() - 20, 10, GREEN);
+        DrawText("v0.9.6 alpha", 5, GetScreenHeight() - 20, 10, GREEN);
         break;
     case SETTINGS:          // Draw Settings Screen
 
@@ -487,7 +491,6 @@ void DrawGame(void)
         DrawText(play_btn_copy.text, play_btn_copy.btn_pos.x, play_btn_copy.btn_pos.y, 40, GREEN);
         DrawText(exit_btn.text, exit_btn.btn_pos.x, exit_btn.btn_pos.y, 40, GREEN);
 
-        DrawText("v0.9.5 alpha", 5, GetScreenHeight() - 20, 10, GREEN);
         break;
     case GAMEPLAY:          // Draw Gameplay
         if (!gameOver)
@@ -565,6 +568,7 @@ void UnloadGame(void)
     UnloadTexture(ship);
     UnloadTexture(background);
     UnloadTexture(turret);
+    UnloadImage(appIcon);
     CloseAudioDevice();
 }
 
