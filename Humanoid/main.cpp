@@ -1,3 +1,7 @@
+// (C) Uljas Antero Lindell 2021
+// Version 0.9.5 Alpha
+
+
 #include "arkanoid.h"
 #include "GameManager.h"
 #include "GUI.h"
@@ -209,6 +213,8 @@ void UpdateGame(void)
                     if (ball.position.x > player.position.x) ball.position.x -= 0.75f;
                     if (ball.position.x < player.position.x) ball.position.x += 0.75f;
                 }
+                if (ball.position.x - ball.radius < 0) ball.position.x++;
+                if (ball.position.x + ball.radius > GetScreenWidth()) ball.position.x--;
                 ball.position.x += ball.speed.x;
                 ball.position.y += ball.speed.y;
             }
@@ -463,7 +469,8 @@ void DrawGame(void)
         DrawText(play_btn.text, play_btn.btn_pos.x, play_btn.btn_pos.y, 40, GREEN);
         DrawText(conf_btn.text, conf_btn.btn_pos.x, conf_btn.btn_pos.y, 40, GREEN);
         DrawText(exit_btn.text, exit_btn.btn_pos.x, exit_btn.btn_pos.y, 40, GREEN);
-
+        
+        DrawText("v0.9.5 alpha", 5, GetScreenHeight() - 20, 10, GREEN);
         break;
     case SETTINGS:          // Draw Settings Screen
 
@@ -479,6 +486,7 @@ void DrawGame(void)
         DrawText(play_btn_copy.text, play_btn_copy.btn_pos.x, play_btn_copy.btn_pos.y, 40, GREEN);
         DrawText(exit_btn.text, exit_btn.btn_pos.x, exit_btn.btn_pos.y, 40, GREEN);
 
+        DrawText("v0.9.5 alpha", 5, GetScreenHeight() - 20, 10, GREEN);
         break;
     case GAMEPLAY:          // Draw Gameplay
         if (!gameOver)
