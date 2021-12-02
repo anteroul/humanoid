@@ -1,5 +1,5 @@
 // (C) Uljas Antero Lindell 2021
-// Version 0.9.6 Alpha
+// Version 0.9.7 Alpha
 
 
 #include "arkanoid.h"
@@ -17,6 +17,9 @@ int main(void)
 
     appIcon = LoadImage("icons/icon.png");
     SetWindowIcon(appIcon);
+
+    if (!frameLimiter.enabled) SetTargetFPS(GetMonitorRefreshRate(GetCurrentMonitor()));
+    else SetTargetFPS(60);
 
     StartUp();
     
@@ -37,7 +40,6 @@ int main(void)
 void StartUp(void)
 {
     InitAudioDevice();
-    SetTargetFPS(GetMonitorRefreshRate(GetCurrentMonitor()));
     btnSfx = LoadSound("sounds/button.wav");
     comboSfx = LoadSound("sounds/coin.wav");
     hitSfx = LoadSound("sounds/hit.wav");
@@ -475,7 +477,7 @@ void DrawGame(void)
         DrawText(conf_btn.text, conf_btn.btn_pos.x, conf_btn.btn_pos.y, 40, GREEN);
         DrawText(exit_btn.text, exit_btn.btn_pos.x, exit_btn.btn_pos.y, 40, GREEN);
         
-        DrawText("v0.9.6 alpha", 5, GetScreenHeight() - 20, 10, GREEN);
+        DrawText("v0.9.7 alpha", 5, GetScreenHeight() - 20, 10, GREEN);
         break;
     case SETTINGS:          // Draw Settings Screen
 
