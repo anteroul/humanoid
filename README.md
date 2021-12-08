@@ -1,5 +1,5 @@
 # Humanoid
-Arkanoid Clone made with RayLib and C++.
+Arkanoid clone made with RayLib and C++.
 
 ##### Controls:
 - Use arrow keys to move.
