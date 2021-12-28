@@ -1,5 +1,5 @@
 // (C) Uljas Antero Lindell 2021
-// Version 0.9.7 Beta
+// Version 0.9.7.5 Beta
 
 
 #include "arkanoid.h"
