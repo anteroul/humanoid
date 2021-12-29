@@ -9,7 +9,7 @@ Arkanoid clone made with RayLib and C++.
 #### Gameplay demo:
 https://user-images.githubusercontent.com/58420474/147691224-219a46e8-da9c-437a-ac61-1797bddd4088.mp4
 
-#### Recommended System Requirements:
+##### Recommended System Requirements:
 - CPU: Dual-Core processor or better
 - GPU: OpenGL video card
 - RAM: 1GB (varies on operating system)
