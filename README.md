@@ -1,5 +1,8 @@
 # Humanoid
-Arkanoid clone made with RayLib and C++.
+Humanoid is a PC game based on the arcade classic Arkanoid. Developed with RayLib and C++14. Uses OpenGL for rendering.
+
+### The story behind Project Humanoid
+Humanoid is one of the most advanced antivirus software in existence. It was developed by the government to protect computer systems from cyberattacks. When the Defense Department was breached the Humanoid was initiated for the first time during a real cyberattack. The finest hour for Project Humanoid.
 
 ##### Controls:
 - Use arrow keys or WASD to move.
