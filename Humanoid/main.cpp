@@ -1,6 +1,7 @@
-// (C) Uljas Antero Lindell 2021
-// Version 0.9.8 Beta
+// Author: Uljas Antero Lindell 2021
+// Version 1.0
 
+#pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
 
 #include "arkanoid.h"
 #include "GameManager.h"
@@ -11,7 +12,7 @@
 #include <math.h>
 
 
-int main(void)
+int main()
 {
     InitWindow(screenWidth, screenHeight, "Humanoid");
 
@@ -152,7 +153,7 @@ void UpdateGame(void)
     {
         player.size.x = ship.width * sizeMultiplier;
 
-        if (level == LEVELS)
+        if (level >= LEVELS)
         {
             if (score > GameManager::ReadScore())
                 GameManager::SubmitScore(score);
@@ -177,9 +178,9 @@ void UpdateGame(void)
         if (!pause)
         {
             // Player movement logic
-            if (IsKeyDown(KEY_LEFT)) player.position.x -= 5;
+            if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A)) player.position.x -= 5;
             if ((player.position.x - player.size.x / 2) <= 0) player.position.x = player.size.x / 2;
-            if (IsKeyDown(KEY_RIGHT)) player.position.x += 5;
+            if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) player.position.x += 5;
             if ((player.position.x + player.size.x / 2) >= screenWidth) player.position.x = screenWidth - player.size.x / 2;
 
             // Ball launching logic
@@ -448,11 +449,11 @@ void UpdateGame(void)
         }
         if (IsKeyPressed(KEY_BACKSPACE))
         {
+            gameState = MENU;
             score = 0;
             level = 1;
-            levelReady = false;
+            InitGame();
             gameOver = false;
-            gameState = MENU;
         }
     }
 }
@@ -477,7 +478,7 @@ void DrawGame(void)
         DrawText(conf_btn.text, conf_btn.btn_pos.x, conf_btn.btn_pos.y, 40, GREEN);
         DrawText(exit_btn.text, exit_btn.btn_pos.x, exit_btn.btn_pos.y, 40, GREEN);
         
-        DrawText("v0.9.8 beta", 5, GetScreenHeight() - 20, 10, GREEN);
+        DrawText("v1.0", 5, GetScreenHeight() - 20, 10, GREEN);
         break;
     case SETTINGS:          // Draw Settings Screen
 
