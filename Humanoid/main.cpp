@@ -1,5 +1,5 @@
 // Author: Uljas Antero Lindell 2021
-// Version 1.0
+// Version 1.01
 
 #pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
 
@@ -478,7 +478,7 @@ void DrawGame(void)
         DrawText(conf_btn.text, conf_btn.btn_pos.x, conf_btn.btn_pos.y, 40, GREEN);
         DrawText(exit_btn.text, exit_btn.btn_pos.x, exit_btn.btn_pos.y, 40, GREEN);
         
-        DrawText("v1.0", 5, GetScreenHeight() - 20, 10, GREEN);
+        DrawText("v1.01", 5, GetScreenHeight() - 20, 10, GREEN);
         break;
     case SETTINGS:          // Draw Settings Screen
 
