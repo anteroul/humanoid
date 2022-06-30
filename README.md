@@ -13,9 +13,6 @@ Humanoid is one of the most advanced antivirus software in existence. It was dev
 ![Screenshot from 2022-02-09 06-20-44](https://user-images.githubusercontent.com/58420474/153121410-fcea9643-3adb-4082-9c46-42a606bd6c47.png)
 
 
-#### Gameplay demo:
-https://user-images.githubusercontent.com/58420474/147691224-219a46e8-da9c-437a-ac61-1797bddd4088.mp4
-
 ##### Recommended System Requirements:
 - CPU: Dual-Core processor or better (not tested on a single-core)
 - GPU: OpenGL video card with 128MB of VRAM (very ancient video cards are not recommended)
