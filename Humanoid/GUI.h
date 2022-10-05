@@ -4,17 +4,17 @@
 
 static const Vector2 btn_size = { screenWidth / 4, screenHeight / 12 };
 
-typedef struct Button {
+struct Button {
 	char text[12] = "";
 	Vector2 btn_pos;
 	Rectangle btn_rect = {btn_pos.x, btn_pos.y, btn_size.x, btn_size.y};
-} Button;
+};
 
-typedef struct ToggleButton {
+struct ToggleButton {
 	bool enabled;
 	char text[32] = "";
 	Rectangle btn_rect;
-} ToggleButton;
+};
 
 static Button play_btn = { "   Play  ", screenWidth / 2.5f, screenHeight / 3 };
 static Button conf_btn = { " Settings", screenWidth / 2.5f, screenHeight / 3 * 1.5f };
@@ -25,5 +25,4 @@ static ToggleButton frameLimiter = { true, "Frame Limiter on/off", screenWidth /
 static ToggleButton fullScreen = { false, "Toggle Fullsceen on/off", screenWidth / 3, screenHeight / 3, screenWidth / 3, screenHeight / 22 };
 
 static Sound btnSfx;
-
 static Image appIcon;

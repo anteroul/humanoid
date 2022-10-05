@@ -9,36 +9,36 @@
 #define MAX_AMMO               30
 
 
-typedef enum GameScreen { MENU, SETTINGS, GAMEPLAY, QUIT } GameScreen;
-typedef enum PowerUps { NONE, EXTRA_LIFE, WIDE, SHOOT, MAGNETIC, SUPERBALL } PowerUps;
+enum GameScreen { MENU, SETTINGS, GAMEPLAY, QUIT };
+enum PowerUps { NONE, EXTRA_LIFE, WIDE, SHOOT, MAGNETIC, SUPERBALL };
 
-typedef struct Player {
+struct Player {
     Vector2 position;
     Vector2 size;
     int life;
-} Player;
+};
 
-typedef struct Ball {
+struct Ball {
     Vector2 position;
     Vector2 speed;
     int radius;
     bool active;
-} Ball;
+};
 
-typedef struct Brick {
+struct Brick {
     Vector2 position;
     bool active;
     int brickType;
     Color color;
-} Brick;
+};
 
-typedef struct Projectile {
+struct Projectile {
     Rectangle rect;
     bool active;
-} Projectile;
+};
 
-static const int screenWidth = 800;
-static const int screenHeight = 600;
+static constexpr int screenWidth = 800;
+static constexpr int screenHeight = 600;
 
 static int bricks;
 static int gameState;
