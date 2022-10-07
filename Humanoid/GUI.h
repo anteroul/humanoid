@@ -1,5 +1,7 @@
 #pragma once
 
+#include <raylib.h>
+
 constexpr int screenWidth = 800;
 constexpr int screenHeight = 600;
 
