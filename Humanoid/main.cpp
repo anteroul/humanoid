@@ -5,7 +5,6 @@
 
 #include "Arkanoid.h"
 
-
 int main()
 {
     Arkanoid game;
