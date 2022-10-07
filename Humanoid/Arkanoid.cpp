@@ -156,254 +156,15 @@ void Arkanoid::UpdateGame()
             levelReady = false;
         }
 
-        if (IsKeyPressed('P'))
-        {
-            pause = !pause;
-            PlaySound(btnSfx);
-        }
-
         if (!pause)
         {
             // Player movement logic
-            if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A)) player.position.x -= 5;
             if ((player.position.x - player.size.x / 2) <= 0) player.position.x = player.size.x / 2;
-            if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) player.position.x += 5;
             if ((player.position.x + player.size.x / 2) >= screenWidth) player.position.x = screenWidth - player.size.x / 2;
 
-            // Ball launching logic
-            if (!ball.active)
-            {
-                if (IsKeyPressed(KEY_SPACE))
-                {
-                    ball.active = true;
-                    ball.speed = Vector2{ 0, -5 };
-                }
-            }
-            else
-            {
-                if (IsKeyPressed(KEY_SPACE) && ammo > 0)
-                {
-                    projectile[ammo].active = true;
-                    projectile[ammo].rect = { player.position.x - 3, player.position.y - 30, 5, 10 };
-                    ammo--;
-                    PlaySound(shoot);
-                }
-            }
-
-            // Projectile logic
-            for (int i = 0; i < 30; i++)
-            {
-                if (projectile[i].active)
-                {
-                    if (projectile[i].rect.y < 0) projectile[i].active = false;
-                    projectile[i].rect.y -= 15;
-                }
-            }
-
-            // Ball movement logic
-            if (ball.active)
-            {
-                if (stickyMode)
-                {
-                    if (ball.position.x > player.position.x) ball.position.x -= 0.75f;
-                    if (ball.position.x < player.position.x) ball.position.x += 0.75f;
-                }
-                if (ball.position.x - ball.radius < 0) ball.position.x++;
-                if (ball.position.x + ball.radius > GetScreenWidth()) ball.position.x--;
-                ball.position.x += ball.speed.x;
-                ball.position.y += ball.speed.y;
-            }
-            else
-            {
-                ball.position = Vector2{ (float)player.position.x, (float)screenHeight * 7 / 8 - 30 };
-            }
-
-            // Collision logic: ball vs walls
-            if (((ball.position.x + ball.radius) >= screenWidth) || ((ball.position.x - ball.radius) <= 0))
-            {
-                ball.speed.x *= -1;
-                PlaySound(hitSfx);
-            }
-            if ((ball.position.y - ball.radius) <= 0)
-            {
-                ball.speed.y *= -1;
-                PlaySound(hitSfx);
-            }
-            if ((ball.position.y + ball.radius) >= screenHeight)
-            {
-                ball.speed = Vector2{ 0, 0 };
-                ball.active = false;
-                stickyMode = false;
-                superBallMode = false;
-                comboMultiplier = 1;
-                player.life--;
-                sizeMultiplier = 1;
-                ammo = 0;
-                PlaySound(loseLife);
-            }
-
-            // Collision logic: ball vs player
-            if (CheckCollisionCircleRec(ball.position, ball.radius,
-                Rectangle{
-                player.position.x - player.size.x / 2, player.position.y - player.size.y / 2, player.size.x, player.size.y
-                }))
-            {
-                if (ball.speed.y > 0)
-                {
-                    ball.speed.y *= -1;
-                    ball.speed.x = (ball.position.x - player.position.x) / (player.size.x / 2) * 5;
-                    comboMultiplier = 1;
-                    PlaySound(hitSfx);
-                }
-            }
-
-            // Collision logic: ball vs bricks
-            for (int i = 0; i < LINES_OF_BRICKS; i++)
-            {
-                for (int j = 0; j < BRICKS_PER_LINE; j++)
-                {
-                    if (brick[i][j].active)
-                    {
-                        // Brick colors
-                        switch (brick[i][j].brickType)
-                        {
-                        case 1:
-                            brick[i][j].color = YELLOW;
-                            break;
-                        case 2:
-                            brick[i][j].color = GREEN;
-                            break;
-                        case 3:
-                            brick[i][j].color = BLUE;
-                            break;
-                        case 4:
-                            brick[i][j].color = MAGENTA;
-                            break;
-                        case 5:
-                            brick[i][j].color = DARKGRAY;
-                            break;
-                        default:
-                            // Destroy brick if brick type is downgraded below type 1
-                            bricks--;
-                            brick[i][j].active = false;
-                            powerup = GameManager::ActivatePowerUp();
-                        }
-
-                        // Projectile hit
-                        for (int k = 0; k < 30; k++)
-                        {
-                            if (CheckCollisionRecs(projectile[k].rect, { brick[i][j].position.x, brick[i][j].position.y, brickSize.x, brickSize.y }) && projectile[k].active)
-                            {
-                                brick[i][j].brickType -= 2;
-                                score += 100;
-                                GameManager::PlayComboSfx(comboSfx, 1);
-                                projectile[k].active = false;
-                            }
-                        }
-
-                        // Hit below
-                        if (((ball.position.y - ball.radius) <= (brick[i][j].position.y + brickSize.y / 2)) &&
-                            ((ball.position.y - ball.radius) > (brick[i][j].position.y + brickSize.y / 2 + ball.speed.y)) &&
-                            ((fabs(ball.position.x - brick[i][j].position.x)) < (brickSize.x / 2 + ball.radius * 2 / 3)) && (ball.speed.y < 0))
-                        {
-                            if (brick[i][j].brickType != 5)
-                            {
-                                brick[i][j].brickType -= damage;
-                                score += 100 * comboMultiplier;
-                                comboMultiplier++;
-                                GameManager::PlayComboSfx(comboSfx, comboMultiplier);
-                            }
-                            else PlaySound(hitSfx);
-                            ball.speed.y *= -1;
-                        }
-                        // Hit above
-                        else if (((ball.position.y + ball.radius) >= (brick[i][j].position.y - brickSize.y / 2)) &&
-                            ((ball.position.y + ball.radius) < (brick[i][j].position.y - brickSize.y / 2 + ball.speed.y)) &&
-                            ((fabs(ball.position.x - brick[i][j].position.x)) < (brickSize.x / 2 + ball.radius * 2 / 3)) && (ball.speed.y > 0))
-                        {
-                            if (brick[i][j].brickType != 5)
-                            {
-                                brick[i][j].brickType -= damage;
-                                score += 100 * comboMultiplier;
-                                comboMultiplier++;
-                                GameManager::PlayComboSfx(comboSfx, comboMultiplier);
-                            }
-                            else PlaySound(hitSfx);
-                            ball.speed.y *= -1;
-                        }
-                        // Hit left
-                        else if (((ball.position.x + ball.radius) >= (brick[i][j].position.x - brickSize.x / 2)) &&
-                            ((ball.position.x + ball.radius) < (brick[i][j].position.x - brickSize.x / 2 + ball.speed.x)) &&
-                            ((fabs(ball.position.y - brick[i][j].position.y)) < (brickSize.y / 2 + ball.radius * 2 / 3)) && (ball.speed.x > 0))
-                        {
-                            if (brick[i][j].brickType != 5)
-                            {
-                                brick[i][j].brickType -= damage;
-                                score += 100 * comboMultiplier;
-                                comboMultiplier++;
-                                GameManager::PlayComboSfx(comboSfx, comboMultiplier);
-                            }
-                            else PlaySound(hitSfx);
-                            ball.speed.x *= -1;
-                        }
-                        // Hit right
-                        else if (((ball.position.x - ball.radius) <= (brick[i][j].position.x + brickSize.x / 2)) &&
-                            ((ball.position.x - ball.radius) > (brick[i][j].position.x + brickSize.x / 2 + ball.speed.x)) &&
-                            ((fabs(ball.position.y - brick[i][j].position.y)) < (brickSize.y / 2 + ball.radius * 2 / 3)) && (ball.speed.x < 0))
-                        {
-                            if (brick[i][j].brickType != 5)
-                            {
-                                brick[i][j].brickType -= damage;
-                                score += 100 * comboMultiplier;
-                                comboMultiplier++;
-                                GameManager::PlayComboSfx(comboSfx, comboMultiplier);
-                            }
-                            else PlaySound(hitSfx);
-                            ball.speed.x *= -1;
-                        }
-                    }
-                }
-            }
-
-            // TODO: Improve power-ups.
-            // 
-            // Power-up logic
-            switch (powerup)
-            {
-            case EXTRA_LIFE:
-                player.life++;
-                PlaySound(extraLife);
-                powerup = NONE;
-                break;
-            case WIDE:
-                sizeMultiplier = 2;
-                stickyMode = false;
-                superBallMode = false;
-                PlaySound(extraLife);
-                powerup = NONE;
-                break;
-            case SHOOT:
-                ammo = MAX_AMMO - 1;
-                PlaySound(extraLife);
-                powerup = NONE;
-                break;
-            case MAGNETIC:
-                sizeMultiplier = 1;
-                superBallMode = false;
-                stickyMode = true;
-                PlaySound(extraLife);
-                powerup = NONE;
-                break;
-            case SUPERBALL:
-                sizeMultiplier = 1;
-                stickyMode = false;
-                superBallMode = true;
-                PlaySound(extraLife);
-                powerup = NONE;
-                break;
-            default:
-                break;
-            }
+            UpdateBall();
+            UpdateBricks();
+            UpdatePowerUps();
 
             // Game over logic
             if (player.life <= 0 && gameOver == false)
@@ -425,24 +186,7 @@ void Arkanoid::UpdateGame()
             }
         }
     }
-    else
-    {
-        if (IsKeyPressed(KEY_ENTER))
-        {
-            score = 0;
-            level = 1;
-            InitGame();
-            gameOver = false;
-        }
-        if (IsKeyPressed(KEY_BACKSPACE))
-        {
-            gameState = MENU;
-            score = 0;
-            level = 1;
-            InitGame();
-            gameOver = false;
-        }
-    }
+    ReadInput();
 }
 
 // Draw game
@@ -465,7 +209,7 @@ void Arkanoid::DrawGame()
         DrawText(conf_btn.text, conf_btn.btn_pos.x, conf_btn.btn_pos.y, 40, GREEN);
         DrawText(exit_btn.text, exit_btn.btn_pos.x, exit_btn.btn_pos.y, 40, GREEN);
 
-        DrawText("v1.02", 5, GetScreenHeight() - 20, 10, GREEN);
+        DrawText("v1.1", 5, GetScreenHeight() - 20, 10, GREEN);
         break;
     case SETTINGS:          // Draw Settings Screen
 
@@ -580,4 +324,281 @@ void Arkanoid::UpdateDrawFrame()
         break;
     }
     DrawGame();
+}
+
+
+void Arkanoid::ReadInput()
+{
+    if (gameState == GAMEPLAY)
+    {
+        if (IsKeyPressed('P'))
+        {
+            pause = !pause;
+            PlaySound(btnSfx);
+        }
+        if (gameOver)
+        {
+            if (IsKeyPressed(KEY_ENTER))
+            {
+                score = 0;
+                level = 1;
+                InitGame();
+                gameOver = false;
+            }
+            if (IsKeyPressed(KEY_BACKSPACE))
+            {
+                gameState = MENU;
+                score = 0;
+                level = 1;
+                InitGame();
+                gameOver = false;
+            }
+        }
+        else
+        {
+            // Player movement logic
+            if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A)) player.position.x -= 5;
+            if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) player.position.x += 5;
+        }
+    }
+}
+
+
+void Arkanoid::UpdateBall()
+{
+    // Ball launching logic
+    if (!ball.active)
+    {
+        if (IsKeyPressed(KEY_SPACE))
+        {
+            ball.active = true;
+            ball.speed = Vector2{ 0, -5 };
+        }
+    }
+    else
+    {
+        if (IsKeyPressed(KEY_SPACE) && ammo > 0)
+        {
+            projectile[ammo].active = true;
+            projectile[ammo].rect = { player.position.x - 3, player.position.y - 30, 5, 10 };
+            ammo--;
+            PlaySound(shoot);
+        }
+    }
+
+    // Projectile logic
+    for (int i = 0; i < 30; i++)
+    {
+        if (projectile[i].active)
+        {
+            if (projectile[i].rect.y < 0) projectile[i].active = false;
+            projectile[i].rect.y -= 15;
+        }
+    }
+
+    // Ball movement logic
+    if (ball.active)
+    {
+        if (stickyMode)
+        {
+            if (ball.position.x > player.position.x) ball.position.x -= 0.75f;
+            if (ball.position.x < player.position.x) ball.position.x += 0.75f;
+        }
+        if (ball.position.x - ball.radius < 0) ball.position.x++;
+        if (ball.position.x + ball.radius > GetScreenWidth()) ball.position.x--;
+        ball.position.x += ball.speed.x;
+        ball.position.y += ball.speed.y;
+    }
+    else
+    {
+        ball.position = Vector2{ (float)player.position.x, (float)screenHeight * 7 / 8 - 30 };
+    }
+
+    // Collision logic: ball vs walls
+    if (((ball.position.x + ball.radius) >= screenWidth) || ((ball.position.x - ball.radius) <= 0))
+    {
+        ball.speed.x *= -1;
+        PlaySound(hitSfx);
+    }
+    if ((ball.position.y - ball.radius) <= 0)
+    {
+        ball.speed.y *= -1;
+        PlaySound(hitSfx);
+    }
+    if ((ball.position.y + ball.radius) >= screenHeight)
+    {
+        ball.speed = Vector2{ 0, 0 };
+        ball.active = false;
+        stickyMode = false;
+        superBallMode = false;
+        comboMultiplier = 1;
+        player.life--;
+        sizeMultiplier = 1;
+        ammo = 0;
+        PlaySound(loseLife);
+    }
+
+    // Collision logic: ball vs player
+    if (CheckCollisionCircleRec(ball.position, ball.radius,
+        Rectangle{
+        player.position.x - player.size.x / 2, player.position.y - player.size.y / 2, player.size.x, player.size.y
+        }))
+    {
+        if (ball.speed.y > 0)
+        {
+            ball.speed.y *= -1;
+            ball.speed.x = (ball.position.x - player.position.x) / (player.size.x / 2) * 5;
+            comboMultiplier = 1;
+            PlaySound(hitSfx);
+        }
+    }
+}
+
+
+void Arkanoid::UpdateBricks()
+{
+    // Collision logic: ball vs bricks
+    for (int i = 0; i < LINES_OF_BRICKS; i++)
+    {
+        for (int j = 0; j < BRICKS_PER_LINE; j++)
+        {
+            if (brick[i][j].active)
+            {
+                // Brick colors
+                switch (brick[i][j].brickType)
+                {
+                case 1:
+                    brick[i][j].color = YELLOW;
+                    break;
+                case 2:
+                    brick[i][j].color = GREEN;
+                    break;
+                case 3:
+                    brick[i][j].color = BLUE;
+                    break;
+                case 4:
+                    brick[i][j].color = MAGENTA;
+                    break;
+                case 5:
+                    brick[i][j].color = DARKGRAY;
+                    break;
+                default:
+                    // Destroy brick if brick type is downgraded below type 1
+                    bricks--;
+                    brick[i][j].active = false;
+                    powerup = GameManager::ActivatePowerUp();
+                }
+
+                // Projectile hit
+                for (int k = 0; k < 30; k++)
+                {
+                    if (CheckCollisionRecs(projectile[k].rect, { brick[i][j].position.x, brick[i][j].position.y, brickSize.x, brickSize.y }) && projectile[k].active)
+                    {
+                        brick[i][j].brickType -= 2;
+                        score += 100;
+                        GameManager::PlayComboSfx(comboSfx, 1);
+                        projectile[k].active = false;
+                    }
+                }
+
+                // Hit below
+                if (((ball.position.y - ball.radius) <= (brick[i][j].position.y + brickSize.y / 2)) &&
+                    ((ball.position.y - ball.radius) > (brick[i][j].position.y + brickSize.y / 2 + ball.speed.y)) &&
+                    ((fabs(ball.position.x - brick[i][j].position.x)) < (brickSize.x / 2 + ball.radius * 2 / 3)) && (ball.speed.y < 0))
+                {
+                    HitVertical(&brick[i][j]);
+                }
+                // Hit above
+                else if (((ball.position.y + ball.radius) >= (brick[i][j].position.y - brickSize.y / 2)) &&
+                    ((ball.position.y + ball.radius) < (brick[i][j].position.y - brickSize.y / 2 + ball.speed.y)) &&
+                    ((fabs(ball.position.x - brick[i][j].position.x)) < (brickSize.x / 2 + ball.radius * 2 / 3)) && (ball.speed.y > 0))
+                {
+                    HitVertical(&brick[i][j]);
+                }
+                // Hit left
+                else if (((ball.position.x + ball.radius) >= (brick[i][j].position.x - brickSize.x / 2)) &&
+                    ((ball.position.x + ball.radius) < (brick[i][j].position.x - brickSize.x / 2 + ball.speed.x)) &&
+                    ((fabs(ball.position.y - brick[i][j].position.y)) < (brickSize.y / 2 + ball.radius * 2 / 3)) && (ball.speed.x > 0))
+                {
+                    HitHorizontal(&brick[i][j]);
+                }
+                // Hit right
+                else if (((ball.position.x - ball.radius) <= (brick[i][j].position.x + brickSize.x / 2)) &&
+                    ((ball.position.x - ball.radius) > (brick[i][j].position.x + brickSize.x / 2 + ball.speed.x)) &&
+                    ((fabs(ball.position.y - brick[i][j].position.y)) < (brickSize.y / 2 + ball.radius * 2 / 3)) && (ball.speed.x < 0))
+                {
+                    HitHorizontal(&brick[i][j]);
+                }
+            }
+        }
+    }
+}
+
+
+void Arkanoid::UpdatePowerUps()
+{
+    switch (powerup)
+    {
+    case EXTRA_LIFE:
+        player.life++;
+        PlaySound(extraLife);
+        powerup = NONE;
+        break;
+    case WIDE:
+        sizeMultiplier = 2;
+        stickyMode = false;
+        superBallMode = false;
+        PlaySound(extraLife);
+        powerup = NONE;
+        break;
+    case SHOOT:
+        ammo = MAX_AMMO - 1;
+        PlaySound(extraLife);
+        powerup = NONE;
+        break;
+    case MAGNETIC:
+        sizeMultiplier = 1;
+        superBallMode = false;
+        stickyMode = true;
+        PlaySound(extraLife);
+        powerup = NONE;
+        break;
+    case SUPERBALL:
+        sizeMultiplier = 1;
+        stickyMode = false;
+        superBallMode = true;
+        PlaySound(extraLife);
+        powerup = NONE;
+        break;
+    default:
+        break;
+    }
+}
+
+
+void Arkanoid::HitHorizontal(Brick* brick)
+{
+    if (brick->brickType != 5)
+    {
+        brick->brickType -= damage;
+        score += 100 * comboMultiplier;
+        comboMultiplier++;
+        GameManager::PlayComboSfx(comboSfx, comboMultiplier);
+    }
+    else PlaySound(hitSfx);
+    ball.speed.x *= -1;
+}
+
+
+void Arkanoid::HitVertical(Brick* brick)
+{
+    if (brick->brickType != 5)
+    {
+        brick->brickType -= damage;
+        score += 100 * comboMultiplier;
+        comboMultiplier++;
+        GameManager::PlayComboSfx(comboSfx, comboMultiplier);
+    }
+    else PlaySound(hitSfx);
+    ball.speed.y *= -1;
 }

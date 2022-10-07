@@ -161,6 +161,7 @@
     <ClInclude Include="GameManager.h" />
     <ClInclude Include="GUI.h" />
     <ClInclude Include="Levels.h" />
+    <ClInclude Include="Structs.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
