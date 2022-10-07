@@ -45,8 +45,8 @@ private:
     void UnloadGame();       // Unload game
     void UpdateDrawFrame();  // Update and Draw (one frame)
     void ReadInput();        // Get input
-
-	void UpdateBall();
+	
+    void UpdateBall();
     void UpdateBricks();
     void UpdatePowerUps();
     void HitHorizontal(Brick* brick);
