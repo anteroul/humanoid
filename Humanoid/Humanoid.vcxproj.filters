@@ -21,9 +21,12 @@
     <ClCompile Include="GameManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Arkanoid.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="arkanoid.h">
+    <ClInclude Include="Arkanoid.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GUI.h">
@@ -32,7 +35,7 @@
     <ClInclude Include="GameManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="levels.h">
+    <ClInclude Include="Levels.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

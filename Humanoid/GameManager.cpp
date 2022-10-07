@@ -1,14 +1,8 @@
 #include "GameManager.h"
-#include "stdlib.h"
-#include "cstdio"
 
-GameManager::GameManager()
-{
-}
+GameManager::GameManager() = default;
 
-GameManager::~GameManager()
-{
-}
+GameManager::~GameManager() = default;
 
 Color GameManager::GetColor(int combo)
 {
@@ -42,19 +36,19 @@ bool GameManager::onClickEvent(Rectangle btn, Sound& sfx)
 			PlaySound(sfx);
 			return true;
 		}
-		else
-			return false;
 	}
+	return false;
 }
 
 int GameManager::ActivatePowerUp()
 {
 	if (RandomBool())
 		return rand() % 5 + 1;
-	else return 0;
+
+	return 0;
 }
 
-void GameManager::PlayComboSfx(Sound& sfx, float pitch)
+void GameManager::PlayComboSfx(const Sound& sfx, float pitch)
 {
 	pitch = 0.02f * pitch + 1.f;
 	SetSoundPitch(sfx, pitch);
@@ -86,6 +80,6 @@ bool GameManager::RandomBool()
 
 	if (i % 10 == 0)
 		return true;
-	else
-		return false;
+
+	return false;
 }

@@ -1,8 +1,10 @@
 #pragma once
 
-#include "arkanoid.h"
+#include "Arkanoid.h"
 
-// TODO: More levels?
+#define LEVELS                  6
+#define LINES_OF_BRICKS         5
+#define BRICKS_PER_LINE        15
 
 static int brickMap[LEVELS][LINES_OF_BRICKS][BRICKS_PER_LINE] = {
 

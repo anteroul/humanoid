@@ -152,14 +152,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Arkanoid.cpp" />
     <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="arkanoid.h" />
+    <ClInclude Include="Arkanoid.h" />
     <ClInclude Include="GameManager.h" />
     <ClInclude Include="GUI.h" />
-    <ClInclude Include="levels.h" />
+    <ClInclude Include="Levels.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
