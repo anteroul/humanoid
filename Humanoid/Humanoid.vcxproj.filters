@@ -41,6 +41,9 @@
     <ClInclude Include="Structs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="GameVariables.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

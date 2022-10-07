@@ -23,7 +23,7 @@ Arkanoid::Arkanoid()
     ship = LoadTexture("graphics/ship.png");
     background = LoadTexture("graphics/background.png");
     turret = LoadTexture("graphics/turret.png");
-    gameState = MENU;
+    g.gameState = MENU;
 }
 
 Arkanoid::~Arkanoid()
@@ -36,7 +36,7 @@ void Arkanoid::RunApplication()
 {
     while (!WindowShouldClose())    // Detect window close button or ESC key
     {
-        if (gameState == QUIT)      // Break the game loop if gameState is set to 'QUIT'
+        if (g.gameState == QUIT)      // Break the game loop if gameState is set to 'QUIT'
             break;
         UpdateDrawFrame();
     }
@@ -44,16 +44,16 @@ void Arkanoid::RunApplication()
 
 void Arkanoid::UpdateMenu()
 {
-    if (gameState == MENU)
+    if (g.gameState == MENU)
     {
         if (GameManager::onClickEvent(play_btn.btn_rect, btnSfx))
-            gameState = GAMEPLAY;
+            g.gameState = GAMEPLAY;
         if (GameManager::onClickEvent(conf_btn.btn_rect, btnSfx))
-            gameState = SETTINGS;
+            g.gameState = SETTINGS;
         if (GameManager::onClickEvent(exit_btn.btn_rect, btnSfx))
-            gameState = QUIT;
+            g.gameState = QUIT;
     }
-    else if (gameState == SETTINGS)
+    else if (g.gameState == SETTINGS)
     {
         if (GameManager::onClickEvent(fullScreen.btn_rect, btnSfx))
         {
@@ -77,9 +77,9 @@ void Arkanoid::UpdateMenu()
             }
         }
         if (GameManager::onClickEvent(play_btn_copy.btn_rect, btnSfx))
-            gameState = GAMEPLAY;
+            g.gameState = GAMEPLAY;
         if (GameManager::onClickEvent(exit_btn.btn_rect, btnSfx))
-            gameState = QUIT;
+            g.gameState = QUIT;
     }
 }
 
@@ -91,7 +91,7 @@ void Arkanoid::InitGame()
     player.position = Vector2{ (float)screenWidth / 2, (float)screenHeight * 7 / 8 };
     player.size = Vector2{ (float)ship.width, (float)ship.height };
 
-    if (level == 1)
+    if (g.level == 1)
         player.life = DEFAULT_LIFE;
 
     // Initialize ball
@@ -100,15 +100,15 @@ void Arkanoid::InitGame()
     ball.radius = 7;
     ball.active = false;
 
-    comboMultiplier = 1;
-    powerup = 0;
-    sizeMultiplier = 1;
-    stickyMode = false;
-    superBallMode = false;
+    g.comboMultiplier = 1;
+    g.powerup = 0;
+    g.sizeMultiplier = 1;
+    g.stickyMode = false;
+    g.superBallMode = false;
 
     // Initialize bricks
     int initialDownPosition = 50;
-    bricks = 0;
+    g.bricks = 0;
 
     for (int i = 0; i < LINES_OF_BRICKS; i++)
     {
@@ -116,13 +116,13 @@ void Arkanoid::InitGame()
         {
             brick[i][j].position = Vector2{ j * brickSize.x + brickSize.x / 2, i * brickSize.y + initialDownPosition };
             brick[i][j].active = true;
-            brick[i][j].brickType = brickMap[level][i][j];
+            brick[i][j].brickType = brickMap[g.level][i][j];
             if (brick[i][j].brickType != 5)
-                bricks++;
+                g.bricks++;
         }
     }
 
-    if (ammo <= 0)
+    if (g.ammo <= 0)
     {
         for (int i = 0; i < MAX_AMMO; i++)
         {
@@ -130,33 +130,33 @@ void Arkanoid::InitGame()
         }
     }
     PlaySound(beginSfx);
-    levelReady = true;
+    g.levelReady = true;
 }
 
 // Update game (one frame)
 void Arkanoid::UpdateGame()
 {
-    if (!gameOver)
+    if (!g.gameOver)
     {
-        player.size.x = ship.width * sizeMultiplier;
+        player.size.x = ship.width * g.sizeMultiplier;
 
-        if (level >= LEVELS)
+        if (g.level >= LEVELS)
         {
-            if (score > GameManager::ReadScore())
-                GameManager::SubmitScore(score);
-            gameOver = true;
+            if (g.score > GameManager::ReadScore())
+                GameManager::SubmitScore(g.score);
+            g.gameOver = true;
         }
 
-        if (!superBallMode) damage = 2;
-        else damage = 4;
+        if (!g.superBallMode) g.damage = 2;
+        else g.damage = 4;
 
-        if (bricks <= 0)
+        if (g.bricks <= 0)
         {
-            level++;
-            levelReady = false;
+            g.level++;
+            g.levelReady = false;
         }
 
-        if (!pause)
+        if (!g.pause)
         {
             // Player movement logic
             if ((player.position.x - player.size.x / 2) <= 0) player.position.x = player.size.x / 2;
@@ -167,11 +167,11 @@ void Arkanoid::UpdateGame()
             UpdatePowerUps();
 
             // Game over logic
-            if (player.life <= 0 && gameOver == false)
+            if (player.life <= 0 && !g.gameOver)
             {
-                if (score > GameManager::ReadScore())
-                    GameManager::SubmitScore(score);
-                gameOver = true;
+                if (g.score > GameManager::ReadScore())
+                    GameManager::SubmitScore(g.score);
+                g.gameOver = true;
                 PlaySound(gameOverSfx);
             }
             else
@@ -180,7 +180,7 @@ void Arkanoid::UpdateGame()
                 {
                     for (int j = 0; j < BRICKS_PER_LINE; j++)
                     {
-                        if (brick[i][j].active) gameOver = false;
+                        if (brick[i][j].active) g.gameOver = false;
                     }
                 }
             }
@@ -197,7 +197,7 @@ void Arkanoid::DrawGame()
     ClearBackground(SKYBLUE);
     DrawTexture(background, 0, 0, WHITE);
 
-    switch (gameState)
+    switch (g.gameState)
     {
     case MENU:              // Draw Main Menu
 
@@ -227,15 +227,15 @@ void Arkanoid::DrawGame()
 
         break;
     case GAMEPLAY:          // Draw Gameplay
-        if (!gameOver)
+        if (!g.gameOver)
         {
             // Draw player bar
-            if (!stickyMode)
+            if (!g.stickyMode)
                 DrawTextureRec(ship, { 0, 0, player.size.x, player.size.y }, { player.position.x - player.size.x / 2, player.position.y - player.size.y / 2 }, WHITE);
             else
                 DrawTextureRec(ship, { 0, 0, player.size.x, player.size.y }, { player.position.x - player.size.x / 2, player.position.y - player.size.y / 2 }, GREEN);
 
-            if (ammo > 0)
+            if (g.ammo > 0)
                 DrawTexture(turret, player.position.x - turret.width / 2, player.position.y - 30, WHITE);
 
             // Draw player lives
@@ -245,7 +245,7 @@ void Arkanoid::DrawGame()
             for (int i = 0; i < 30; i++) if (projectile[i].active) DrawRectangle(projectile[i].rect.x, projectile[i].rect.y, projectile[i].rect.width, projectile[i].rect.height, WHITE);
 
             // Draw ball
-            if (!superBallMode) DrawCircleV(ball.position, ball.radius, WHITE);
+            if (!g.superBallMode) DrawCircleV(ball.position, ball.radius, WHITE);
             else DrawCircleV(ball.position, ball.radius, MAROON);
 
             // Draw bricks
@@ -259,24 +259,24 @@ void Arkanoid::DrawGame()
             }
 
             // Draw score
-            DrawText(TextFormat("%04i", score), screenWidth - 150, screenHeight - 50, 40, GREEN);
+            DrawText(TextFormat("%04i", g.score), screenWidth - 150, screenHeight - 50, 40, GREEN);
 
-            if (comboMultiplier > 2)
-                DrawText(TextFormat("%01ix Combo!", comboMultiplier - 1), GetScreenWidth() / 2 - 50, GetScreenHeight() / 2, 20, GameManager::GetColor(comboMultiplier));
+            if (g.comboMultiplier > 2)
+                DrawText(TextFormat("%01ix Combo!", g.comboMultiplier - 1), GetScreenWidth() / 2 - 50, GetScreenHeight() / 2, 20, GameManager::GetColor(g.comboMultiplier));
 
-            if (pause) DrawText("GAME PAUSED", screenWidth / 2 - MeasureText("GAME PAUSED", 40) / 2, screenHeight / 2 - 40, 40, WHITE);
+            if (g.pause) DrawText("GAME PAUSED", screenWidth / 2 - MeasureText("GAME PAUSED", 40) / 2, screenHeight / 2 - 40, 40, WHITE);
         }
         else
         {
             DrawText("PRESS [ENTER] TO PLAY AGAIN", GetScreenWidth() / 2 - MeasureText("PRESS [ENTER] TO PLAY AGAIN", 20) / 2, GetScreenHeight() / 2 - 80, 20, GREEN);
             DrawText("PRESS [BACKSPACE] TO RETURN TO MAIN MENU", GetScreenWidth() / 2 - MeasureText("PRESS [BACKSPACE] TO RETURN TO MAIN MENU", 20) / 2, GetScreenHeight() / 2 - 50, 20, GREEN);
 
-            if (score >= GameManager::ReadScore())
+            if (g.score >= GameManager::ReadScore())
                 DrawText("NEW HIGH SCORE!", GetScreenWidth() / 2 - MeasureText("NEW HIGH SCORE!", 20) / 2, GetScreenHeight() / 2, 20, WHITE);
             else
                 DrawText(TextFormat("your high score: %04i", GameManager::ReadScore()), GetScreenWidth() / 2 - 120, GetScreenHeight() / 2, 20, GREEN);
 
-            DrawText(TextFormat("%04i", score), GetScreenWidth() / 2 - MeasureText(TextFormat("%04i", score), 40) / 2, GetScreenHeight() / 2 + 40, 40, GREEN);
+            DrawText(TextFormat("%04i", g.score), GetScreenWidth() / 2 - MeasureText(TextFormat("%04i", g.score), 40) / 2, GetScreenHeight() / 2 + 40, 40, GREEN);
         }
 
         break;
@@ -309,7 +309,7 @@ void Arkanoid::UnloadGame()
 // Update and Draw (one frame)
 void Arkanoid::UpdateDrawFrame()
 {
-    switch (gameState)
+    switch (g.gameState)
     {
     case MENU:
         UpdateMenu();
@@ -318,7 +318,7 @@ void Arkanoid::UpdateDrawFrame()
         UpdateMenu();
         break;
     case GAMEPLAY:
-        if (!levelReady)
+        if (!g.levelReady)
             InitGame();
         UpdateGame();
         break;
@@ -329,29 +329,29 @@ void Arkanoid::UpdateDrawFrame()
 
 void Arkanoid::ReadInput()
 {
-    if (gameState == GAMEPLAY)
+    if (g.gameState == GAMEPLAY)
     {
         if (IsKeyPressed('P'))
         {
-            pause = !pause;
+            g.pause = !g.pause;
             PlaySound(btnSfx);
         }
-        if (gameOver)
+        if (g.gameOver)
         {
             if (IsKeyPressed(KEY_ENTER))
             {
-                score = 0;
-                level = 1;
+                g.score = 0;
+                g.level = 1;
                 InitGame();
-                gameOver = false;
+                g.gameOver = false;
             }
             if (IsKeyPressed(KEY_BACKSPACE))
             {
-                gameState = MENU;
-                score = 0;
-                level = 1;
+                g.gameState = MENU;
+                g.score = 0;
+                g.level = 1;
                 InitGame();
-                gameOver = false;
+                g.gameOver = false;
             }
         }
         else
@@ -377,11 +377,11 @@ void Arkanoid::UpdateBall()
     }
     else
     {
-        if (IsKeyPressed(KEY_SPACE) && ammo > 0)
+        if (IsKeyPressed(KEY_SPACE) && g.ammo > 0)
         {
-            projectile[ammo].active = true;
-            projectile[ammo].rect = { player.position.x - 3, player.position.y - 30, 5, 10 };
-            ammo--;
+            projectile[g.ammo].active = true;
+            projectile[g.ammo].rect = { player.position.x - 3, player.position.y - 30, 5, 10 };
+            g.ammo--;
             PlaySound(shoot);
         }
     }
@@ -399,7 +399,7 @@ void Arkanoid::UpdateBall()
     // Ball movement logic
     if (ball.active)
     {
-        if (stickyMode)
+        if (g.stickyMode)
         {
             if (ball.position.x > player.position.x) ball.position.x -= 0.75f;
             if (ball.position.x < player.position.x) ball.position.x += 0.75f;
@@ -429,12 +429,12 @@ void Arkanoid::UpdateBall()
     {
         ball.speed = Vector2{ 0, 0 };
         ball.active = false;
-        stickyMode = false;
-        superBallMode = false;
-        comboMultiplier = 1;
+        g.stickyMode = false;
+        g.superBallMode = false;
+        g.comboMultiplier = 1;
         player.life--;
-        sizeMultiplier = 1;
-        ammo = 0;
+        g.sizeMultiplier = 1;
+        g.ammo = 0;
         PlaySound(loseLife);
     }
 
@@ -448,7 +448,7 @@ void Arkanoid::UpdateBall()
         {
             ball.speed.y *= -1;
             ball.speed.x = (ball.position.x - player.position.x) / (player.size.x / 2) * 5;
-            comboMultiplier = 1;
+            g.comboMultiplier = 1;
             PlaySound(hitSfx);
         }
     }
@@ -484,9 +484,9 @@ void Arkanoid::UpdateBricks()
                     break;
                 default:
                     // Destroy brick if brick type is downgraded below type 1
-                    bricks--;
+                    g.bricks--;
                     brick[i][j].active = false;
-                    powerup = GameManager::ActivatePowerUp();
+                    g.powerup = GameManager::ActivatePowerUp();
                 }
 
                 // Projectile hit
@@ -495,7 +495,7 @@ void Arkanoid::UpdateBricks()
                     if (CheckCollisionRecs(projectile[k].rect, { brick[i][j].position.x, brick[i][j].position.y, brickSize.x, brickSize.y }) && projectile[k].active)
                     {
                         brick[i][j].brickType -= 2;
-                        score += 100;
+                        g.score += 100;
                         GameManager::PlayComboSfx(comboSfx, 1);
                         projectile[k].active = false;
                     }
@@ -537,38 +537,38 @@ void Arkanoid::UpdateBricks()
 
 void Arkanoid::UpdatePowerUps()
 {
-    switch (powerup)
+    switch (g.powerup)
     {
     case EXTRA_LIFE:
         player.life++;
         PlaySound(extraLife);
-        powerup = NONE;
+        g.powerup = NONE;
         break;
     case WIDE:
-        sizeMultiplier = 2;
-        stickyMode = false;
-        superBallMode = false;
+        g.sizeMultiplier = 2;
+        g.stickyMode = false;
+        g.superBallMode = false;
         PlaySound(extraLife);
-        powerup = NONE;
+        g.powerup = NONE;
         break;
     case SHOOT:
-        ammo = MAX_AMMO - 1;
+        g.ammo = MAX_AMMO - 1;
         PlaySound(extraLife);
-        powerup = NONE;
+        g.powerup = NONE;
         break;
     case MAGNETIC:
-        sizeMultiplier = 1;
-        superBallMode = false;
-        stickyMode = true;
+        g.sizeMultiplier = 1;
+        g.superBallMode = false;
+        g.stickyMode = true;
         PlaySound(extraLife);
-        powerup = NONE;
+        g.powerup = NONE;
         break;
     case SUPERBALL:
-        sizeMultiplier = 1;
-        stickyMode = false;
-        superBallMode = true;
+        g.sizeMultiplier = 1;
+        g.stickyMode = false;
+        g.superBallMode = true;
         PlaySound(extraLife);
-        powerup = NONE;
+        g.powerup = NONE;
         break;
     default:
         break;
@@ -580,10 +580,10 @@ void Arkanoid::HitHorizontal(Brick* brick)
 {
     if (brick->brickType != 5)
     {
-        brick->brickType -= damage;
-        score += 100 * comboMultiplier;
-        comboMultiplier++;
-        GameManager::PlayComboSfx(comboSfx, comboMultiplier);
+        brick->brickType -= g.damage;
+        g.score += 100 * g.comboMultiplier;
+        g.comboMultiplier++;
+        GameManager::PlayComboSfx(comboSfx, g.comboMultiplier);
     }
     else PlaySound(hitSfx);
     ball.speed.x *= -1;
@@ -594,10 +594,10 @@ void Arkanoid::HitVertical(Brick* brick)
 {
     if (brick->brickType != 5)
     {
-        brick->brickType -= damage;
-        score += 100 * comboMultiplier;
-        comboMultiplier++;
-        GameManager::PlayComboSfx(comboSfx, comboMultiplier);
+        brick->brickType -= g.damage;
+        g.score += 100 * g.comboMultiplier;
+        g.comboMultiplier++;
+        GameManager::PlayComboSfx(comboSfx, g.comboMultiplier);
     }
     else PlaySound(hitSfx);
     ball.speed.y *= -1;

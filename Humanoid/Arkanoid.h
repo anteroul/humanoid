@@ -3,6 +3,7 @@
 #include <cmath>
 #include <raylib.h>
 #include "GameManager.h"
+#include "GameVariables.h"
 #include "GUI.h"
 #include "Levels.h"
 #include "Structs.h"
@@ -20,6 +21,7 @@ private:
     enum GameScreen { MENU, SETTINGS, GAMEPLAY, QUIT };
     enum PowerUps { NONE, EXTRA_LIFE, WIDE, SHOOT, MAGNETIC, SUPERBALL };
 
+    GameVariables g = {};
     Player player = {};
     Ball ball = {};
     Brick brick[LINES_OF_BRICKS][BRICKS_PER_LINE] = {};
@@ -35,21 +37,6 @@ private:
     Sound extraLife;
     Sound loseLife;
     Sound shoot;
-
-    int bricks;
-    int gameState;
-    int level = 1;
-    int score = 0;
-    int comboMultiplier = 1;
-    int powerup = 0;
-    int sizeMultiplier = 1;
-    int ammo = 0;
-    int damage = 2;
-    bool levelReady = false;
-    bool gameOver = false;
-    bool pause = false;
-    bool stickyMode = false;
-    bool superBallMode = false;
 
     void InitGame();         // Initialize game
     void UpdateMenu();       // Update main menu

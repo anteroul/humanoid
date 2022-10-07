@@ -159,6 +159,7 @@
   <ItemGroup>
     <ClInclude Include="Arkanoid.h" />
     <ClInclude Include="GameManager.h" />
+    <ClInclude Include="GameVariables.h" />
     <ClInclude Include="GUI.h" />
     <ClInclude Include="Levels.h" />
     <ClInclude Include="Structs.h" />
