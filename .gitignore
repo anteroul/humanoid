@@ -361,3 +361,8 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/Humanoid/Humanoid.vcxproj
+/Humanoid/Humanoid.vcxproj.filters
+/Humanoid/packages.config
+/Humanoid/raylib.dll
+/Humanoid/raylib.lib
