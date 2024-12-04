@@ -361,6 +361,8 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# Library binaries and Visual Studio files
 /Humanoid/Humanoid.vcxproj
 /Humanoid/Humanoid.vcxproj.filters
 /Humanoid/packages.config

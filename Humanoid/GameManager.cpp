@@ -1,29 +1,17 @@
 #include "GameManager.h"
 
-GameManager::GameManager() = default;
-
-GameManager::~GameManager() = default;
-
 Color GameManager::GetColor(int combo)
 {
 	switch (combo)
 	{
-	case 3:
-		return RED;
-	case 4:
-		return GREEN;
-	case 5:
-		return YELLOW;
-	case 6:
-		return BLUE;
-	case 7:
-		return MAROON;
-	case 8:
-		return DARKGREEN;
-	case 9:
-		return WHITE;
-	default:
-		return MAGENTA;
+	case 3: return RED;
+	case 4: return GREEN;
+	case 5: return YELLOW;
+	case 6: return BLUE;
+	case 7: return MAROON;
+	case 8: return DARKGREEN;
+	case 9: return WHITE;
+	default: return MAGENTA;
 	}
 }
 
@@ -67,11 +55,23 @@ void GameManager::SubmitScore(int score)
 int GameManager::ReadScore()
 {
 	FILE* lboard;
-	int score;
+	int score = 0;
 	lboard = fopen("data/leaderboards.bin", "rb");
 	fread((char*)&score, sizeof(int), 1, lboard);
 	fclose(lboard);
 	return score;
+}
+
+void GameManager::ReadVersion(char& v)
+{
+	FILE* file;
+	size_t nread;
+	file = fopen("data/version.txt", "r");
+	if (file) {
+		while ((nread = fread(&v, 5, sizeof v, file)) > 0)
+			fwrite(&v, 1, nread, stdout);
+		fclose(file);
+	}
 }
 
 bool GameManager::RandomBool()

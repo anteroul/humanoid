@@ -20,6 +20,7 @@ public:
 private:
     enum GameScreen { MENU, SETTINGS, GAMEPLAY, QUIT };
     enum PowerUps { NONE, EXTRA_LIFE, WIDE, SHOOT, MAGNETIC, SUPERBALL };
+    char version[5] = "v1.0";
 
     GameVariables g = {};
     Player player = {};

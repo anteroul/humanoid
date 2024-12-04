@@ -1,5 +1,5 @@
 // Author: Uljas Antero Lindell 2021
-// Version 1.1
+// Version 1.2
 
 #pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
 

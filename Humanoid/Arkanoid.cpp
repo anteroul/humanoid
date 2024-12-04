@@ -2,6 +2,7 @@
 
 Arkanoid::Arkanoid()
 {
+    GameManager::ReadVersion(*version);
     InitWindow(screenWidth, screenHeight, "Humanoid");
 
     appIcon = LoadImage("icons/icon.png");
@@ -209,7 +210,8 @@ void Arkanoid::DrawGame()
         DrawText(conf_btn.text, conf_btn.btn_pos.x, conf_btn.btn_pos.y, 40, GREEN);
         DrawText(exit_btn.text, exit_btn.btn_pos.x, exit_btn.btn_pos.y, 40, GREEN);
 
-        DrawText("v1.1", 5, GetScreenHeight() - 20, 10, GREEN);
+        //DrawText("v1.1", 5, GetScreenHeight() - 20, 10, GREEN);
+        DrawText(version, 5, GetScreenHeight() - 20, 10, GREEN);
         break;
     case SETTINGS:          // Draw Settings Screen
 
